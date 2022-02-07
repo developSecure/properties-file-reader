@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="2dbe170a-294a-4205-bacd-d1e4ff1eaabc" basePath="/" >
+		<http:listener-connection host="0.0.0.0" port="8089" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="2f068b31-2a80-4009-a4ae-81563e9aa8bf" >
+		<file:connection workingDir="C:\Users\oshen\AnypointStudio\studio-workspace" />
+	</file:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="5ae27c96-9a97-42ee-be4b-080ded6b5236" file="config\local-properties.yaml" />
+	<file:config name="File_Config_Test" doc:name="File Config" doc:id="6572f195-3375-4dc5-85d5-7646a49f0760" >
+		<file:connection workingDir="C:\Users\oshen\properties" />
+	</file:config>
+</mule>

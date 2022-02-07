@@ -1,0 +1,72 @@
+workingDirectory: "C:/Users/oshen/AnypointStudio/studio-workspace/"
+
+folder:
+  path: "/src/main/resources/config/"
+  
+projects:
+  namelist: ["b2b-foe-bidwh-system-api","b2b-foe-mnetics-system-api","b2b-foe-remtp-system-api","b2b-foe-sfdc-system-api","b2b-sap-account-process-api","b2b-sap-asn-process-api","b2b-sap-invoice-portal-system-api","b2b-sap-order-process-api","b2b-sap-price-process-api","b2b-sap-product-process-api","b2b-sap-sfdc-experience-api","b2b-sap-sfdc-system-api","b2b-sap-supplier-process-api","b2b-sap-tpos-system-api","b2b-sap-vendor-process-api","b2b-supplier-point-db-system-api","b2b-hub-account-process-api","b2b-hub-ingres-system-api","b2b-hub-remtp-system-api","b2b-hub-sfdc-system-api","b2b-hub-van-schedule-process-api"]
+  #namelist: ["b2b-hub-account-process-api","b2b-hub-ingres-system-api","b2b-hub-remtp-system-api","b2b-hub-sfdc-system-api","b2b-hub-van-schedule-process-api"]
+  
+property:
+  fileList: ["local-properties.yaml","dev-properties.yaml","qa-properties.yaml","uat-properties.yaml","prod-properties.yaml"]
+  #fileList: ["local-properties.yaml","dev-properties.yaml"]
+  
+descriptions: [
+  "api.version - version of created API",
+  "autodiscovery.api.id - id of created API in API Manager for pairing with the deployed application on the platform",
+  "http.listener.path - base api part of url",
+  "mule.username - mulesoft user name account",
+  "mule.password - password for mulesoft user account",
+  "db.host - database host IP address",
+  "db.port - database port number",
+  "db.instance - database instance",
+  "db.user - database user name",
+  "db.password - database user password",
+  "http.foe-mnetics.host - host of foe-mnetics server to connect to",
+  "http.foe-mnetics.port - foe-mnetics server port number",
+  "http.foe-mnetics.basePath - foe-mnetics server api part of url",
+  "http.foe-mnetics.timeout - foe-mnetics server timeout in milliseconds",
+  "http.foe-mnetics.username - foe-mnetics server user name",
+  "http.foe-mnetics.password - foe-mnetics user password",
+  "http.remtp.host - host of remtp server to connect to",
+  "http.remtp.port - remtp server port number",
+  "http.remtp.basePath - remtp server api part of url",
+  "http.remtp.timeout - remtp server timeout in milliseconds",
+  "http.remtp.fields - remtp server fields",
+  "http.remtp.routing - remtp server routing for specific branch ids",
+  "remtp.host - host of remtp server to connect to",
+  "remtp.timeout - remtp server timeout in milliseconds",
+  "remtp.stock-availability.port - remtp stock-availability integration server port number",
+  "remtp.stock-availability.method - remtp stock-availability integration server method name to call",
+  "remtp.stock-availability-star-k.port - remtp stock-availability-star-k integration server port number",
+  "remtp.stock-availability-star-k.method - remtp stock-availability-star-k integration server method name to call",
+  "remtp.stock-availability-obtain.port - remtp stock-availability-obtain integration server port number",
+  "remtp.stock-availability-obtain.method - remtp stock-availability-obtain integration server method name to call",
+  "remtp.live-stock.port - remtp live-stock integration server port number",
+  "remtp.live-stock.method - remtp live-stock integration server method name to call",
+  "remtp.place-order.default-host - default host of remtp place-order integration server to connect to",
+  "remtp.place-order.default-port - default remtp place-order integration server port number",
+  "remtp.place-order.default-po-port - default po remtp place-order integration server port number",
+  "remtp.place-order.v007-host - host of remtp place-order integration server of version 007 to connect to",
+  "remtp.place-order.v008-host - host of remtp place-order integration server of version 008 to connect to",
+  "remtp.place-order.v009-host - host of remtp place-order integration server of version 009 to connect to",
+  "remtp.place-order.getListBranches - list of remtp place-order integration branches",
+  "remtp.place-order.getListServers - list of remtp place-order integration servers",
+  "remtp.place-order.getActiveServer - remtp place-order integration active server",
+  "remtp.place-order.commitRetries - number of attempts to connect to remtp place-order integration server",
+  "remtp.list-recent-orders.port - remtp list-recent-orders integration server port number",
+  "remtp.list-recent-orders.method - remtp list-recent-orders integration server method name to call",
+  "remtp.recent-order-details.port - remtp recent-order-details integration server port number",
+  "remtp.recent-order-details.method - remtp recent-order-details integration server method name to call",
+  "remtp.query-back-order.port - remtp query-back-order integration server port number",
+  "remtp.query-back-order.method - remtp query-back-order integration server method name to call",
+  "remtp.back-order-cancellation.port - remtp back-order-cancellation integration server port number",
+  "remtp.back-order-cancellation.method - remtp back-order-cancellation integration server method name to call",
+  "remtp.batch.size - maximum number of records processed per batch",
+  "remtp.batch.blockSize - maximum number of records processed per batch",
+  "remtp.batch.aggregatorSize - number of records for processing in batch aggregator phase",
+  "remtp.batch.wait - waiting time between processors in milliseconds",
+  "remtp.control.retries - number of attempts to connect to remtp server",
+  "remtp.control.wait - waiting time between connection retry to remtp server in milliseconds"
+
+  ]
