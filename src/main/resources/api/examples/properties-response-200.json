@@ -1,0 +1,24 @@
+{
+	"Properties": [
+    {
+		"api name": "some-system-api",
+		"property full path": "api.version",
+		"description": "version of api",
+		"local value": "v2",
+		"dev value": "v2",
+		"qa value": "v2",
+		"uat value": "v2",
+		"prod value": "v2"
+    },
+    {
+		"api name": "some-system-api",
+		"property full path": "autodiscovery.api.id",
+		"description": "id of platform created api to connect with Runtime manager deployed applications",
+		"local value": "123",
+		"dev value": "444444",
+		"qa value": "555555",
+		"uat value": "666666",
+		"prod value": "777777"
+    }
+  ]
+}

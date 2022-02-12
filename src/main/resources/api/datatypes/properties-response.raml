@@ -1,0 +1,50 @@
+#%RAML 1.0 Library
+ 
+types:
+  Response:
+    type: object
+    properties:
+      Properties:
+        type: array
+        items: Row
+        
+  Row:
+    type: object
+    properties:
+      api name:
+        type: string
+        required: true
+        example: "some-system-api"
+      property full path:
+        type: string
+        required: true
+        example: "api.version"
+      description:
+        type: string
+        required: true
+        example: "version of api"
+      local value:
+        type: string
+        required: true
+        example: "v1"
+      dev value:
+        type: string
+        required: true
+        example: "v1"
+      qa value:
+        type: string
+        required: true
+        example: "v1"
+      uat value:
+        type: string
+        required: true
+        example: "v1"
+      prod value:
+        type: string
+        required: true
+        example: "v1"  
+    
+          
+    
+      
+  

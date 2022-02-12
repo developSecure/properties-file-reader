@@ -1,0 +1,19 @@
+#%RAML 1.0
+title: <Configuration files reader API>
+version: v1
+description: API for retrieving configuration information from yaml property files of searched APIs and writing all properties to xlsx file
+
+uses:
+  config-properties-response: datatypes/properties-response.raml
+
+/read-files:
+  get:
+    description: Retrieve all properties from yaml config file
+    responses:
+      200:
+        body:
+          application/json:
+            type: config-properties-response.Response
+            example: !include examples/properties-response-200.json
+          
+    

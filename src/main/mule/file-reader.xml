@@ -25,7 +25,6 @@ payload]]]></file:content>
 		</file:write>
 	</sub-flow>
 	<flow name="folders-readerSubFlow" doc:id="089aff75-83e1-402b-9076-1601f063d7b4" >
-		<http:listener doc:name="Listener" doc:id="81d55229-b19c-4c7d-b90f-fd289d8d481d" config-ref="HTTP_Listener_config" path="/folders" allowedMethods="GET"/>
 		<set-variable value="#[[] as Array]" doc:name="Prepare var for all api properties result" doc:id="a307e4ce-3428-4f6f-a961-b38284955778" variableName="totalProperties" />
 		<foreach doc:name="For Each" doc:id="55035f78-f72a-40d1-90b4-a459e8baabab" collection="#[p('projects.namelist') splitBy &quot;,&quot;]">
 			<set-variable value='#[payload]' doc:name="Set api name" doc:id="e44fe169-cba2-4c99-bfcd-cb11c3d482e8" variableName="apiName" />
