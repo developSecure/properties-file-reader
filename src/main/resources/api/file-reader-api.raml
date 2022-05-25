@@ -4,16 +4,45 @@ version: v1
 description: API for retrieving configuration information from yaml property files of searched APIs and writing all properties to xlsx file
 
 uses:
+  config-properties-request: datatypes/properties-request.raml
   config-properties-response: datatypes/properties-response.raml
 
 /read-files:
   get:
-    description: Retrieve all properties from yaml config file
+    description: Retrieve all properties from yaml config file      
     responses:
       200:
         body:
           application/json:
             type: config-properties-response.Response
             example: !include examples/properties-response-200.json
-          
+            
+/read-properties:
+  post:
+    description: Retrieve all properties from yaml config files
+    body: 
+        application/json:
+          type: config-properties-request.properties-request
+          example: !include examples/properties-request.json
+    responses: 
+        200:
+          description: Standard response representing success
+          body:
+            application/json:
+              type: config-properties-response.Response
+              example: !include examples/properties-response-200.json
+            
+/read-flows:
+  post:
+    description: Retrieve information of all api calls from implementation flow
+    body: 
+        application/json:
+          type: config-properties-request.properties-request
+          example: !include examples/properties-request.json
+    responses:
+      200:
+        body:
+          application/json:
+            type: string
+            example: ""          
     

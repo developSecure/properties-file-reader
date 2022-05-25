@@ -1,0 +1,218 @@
+[
+  {
+    "key": "Call-Account-SalesForceApi-SubFlow",
+    "fileName": "b2b_hub_account_process_impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts",
+          "httpRequestConfigRef": "SalesForce_API_HTTP_Request",
+          "httpRequestMethod": "PUT"
+        },
+        "componentName": null
+      }
+    ]
+  },
+  {
+    "key": "while-loop-Account-SubFlow",
+    "fileName": "b2b_hub_account_process_impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "control-accounts",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": null
+      },
+      {
+        "componentAttributes": {
+          "flowRefName": "Call-Ingres-Account-SubFlow"
+        },
+        "componentName": "Call-Ingres-Account-SubFlow"
+      },
+      {
+        "componentAttributes": {
+          "flowRefName": "while-loop-Account-SubFlow"
+        },
+        "componentName": "while-loop-Account-SubFlow"
+      }
+    ]
+  },
+  {
+    "key": "processIngresAccountsRspSubFlow",
+    "fileName": "b2b_hub_account_process_impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Call-Account-SalesForceApi-SubFlow"
+        },
+        "componentName": "Call-Account-SalesForceApi-SubFlow"
+      }
+    ]
+  },
+  {
+    "key": "Scheduler-Account-Call-SubFlow",
+    "fileName": "b2b_hub_account_process_impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "while-loop-Account-SubFlow"
+        },
+        "componentName": "while-loop-Account-SubFlow"
+      }
+    ]
+  },
+  {
+    "key": "Get-Accounts-SubFlow",
+    "fileName": "b2b_hub_account_process_impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "while-loop-Account-SubFlow"
+        },
+        "componentName": "while-loop-Account-SubFlow"
+      }
+    ]
+  },
+  {
+    "key": "Get-Account-Markers-SubFlow",
+    "fileName": "b2b_hub_account_process_impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Call-Ingres-Account-Markers-SubFlow"
+        },
+        "componentName": "Call-Ingres-Account-Markers-SubFlow"
+      }
+    ]
+  },
+  {
+    "key": "Scheduler-Account-Markers-Call-SubFlow",
+    "fileName": "b2b_hub_account_process_impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Call-Ingres-Account-Markers-SubFlow"
+        },
+        "componentName": "Call-Ingres-Account-Markers-SubFlow"
+      }
+    ]
+  },
+  {
+    "key": "Call-Ingres-Account-Markers-SubFlow",
+    "fileName": "b2b_hub_account_process_impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts/markers/count",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": null
+      },
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts/markers",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": null
+      },
+      {
+        "componentAttributes": {
+          "flowRefName": "processIngresAccountMarkersRspSubFlow"
+        },
+        "componentName": "processIngresAccountMarkersRspSubFlow"
+      }
+    ]
+  },
+  {
+    "key": "processIngresAccountMarkersRspSubFlow",
+    "fileName": "b2b_hub_account_process_impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Call-Account-Marker-SalesForceApi-SubFlow"
+        },
+        "componentName": "Call-Account-Marker-SalesForceApi-SubFlow"
+      }
+    ]
+  },
+  {
+    "key": "Call-Account-Marker-SalesForceApi-SubFlow",
+    "fileName": "b2b_hub_account_process_impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts/markers",
+          "httpRequestConfigRef": "SalesForce_API_HTTP_Request",
+          "httpRequestMethod": "PUT"
+        },
+        "componentName": null
+      }
+    ]
+  },
+  {
+    "key": "Call-Ingres-Account-SubFlow",
+    "fileName": "b2b_hub_account_process_impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts/count",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": null
+      },
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": null
+      },
+      {
+        "componentAttributes": {
+          "flowRefName": "processIngresAccountRspSubFlow"
+        },
+        "componentName": "processIngresAccountRspSubFlow"
+      }
+    ]
+  },
+  {
+    "key": "processIngresAccountRspSubFlow",
+    "fileName": "b2b_hub_account_process_impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Call-Account-SalesForceApi-SubFlow"
+        },
+        "componentName": "Call-Account-SalesForceApi-SubFlow"
+      }
+    ]
+  },
+  {
+    "key": "Get-Account-SubFlow",
+    "fileName": "b2b_hub_account_process_impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts/{uniqueAccountNumber}",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": null
+      },
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts",
+          "httpRequestConfigRef": "SalesForce_API_HTTP_Request",
+          "httpRequestMethod": "PUT"
+        },
+        "componentName": null
+      }
+    ]
+  }
+]

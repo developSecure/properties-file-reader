@@ -1,0 +1,298 @@
+[
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "api.version",
+        "description": "version of created API",
+        "local value": "",
+        "dev value": "",
+        "qa value": "v1",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "autodiscovery.api.id",
+        "description": "id of created API in API Manager for pairing with the deployed application on the platform",
+        "local value": "",
+        "dev value": "",
+        "qa value": "646629",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "scheduler.accounts.cron",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "0 30 21 * * ? *",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "scheduler.accounts.tries",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "3",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "scheduler.accounts.wait",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "300000",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "scheduler.accounts.timezone",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "Europe/London",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "scheduler.accountMarkers.cron",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "0 00 23 * * ? *",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "scheduler.accountMarkers.tries",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "3",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "scheduler.accountMarkers.wait",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "300000",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "scheduler.accountMarkers.timezone",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "Europe/London",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "batch.accounts.size",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "3000",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "batch.accounts.blockSize",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "100",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "batch.accountMarkers.size",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "3000",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "batch.accountMarkers.blockSize",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "100",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "http.listener.path",
+        "description": "base api part of url",
+        "local value": "",
+        "dev value": "",
+        "qa value": "account-pa/api/${api.version}",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "http.ingres-api.host",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "10.117.64.48",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "http.ingres-api.port",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "8081",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "http.ingres-api.timeout",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "720000",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "http.ingres-api.basePath",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "ingres-sa/api/${api.version}",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "http.salesforce-api.host",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "10.117.64.48",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "http.salesforce-api.port",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "8081",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "http.salesforce-api.timeout",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "720000",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "http.salesforce-api.basePath",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "sfdc-sa/api/${api.version}",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "sortGroup.count",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "8",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "sortGroup.wait",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "60000",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "pagination.accountMarkers.offset",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "0",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "pagination.accountMarkers.limit",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "12000",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "pagination.accounts.offset",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "0",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": "b2b-hub-account-process-api",
+        "property full path": "pagination.accounts.limit",
+        "description": "",
+        "local value": "",
+        "dev value": "",
+        "qa value": "3000",
+        "uat value": "",
+        "prod value": ""
+    },
+    {
+        "api name": ""
+    },
+    {
+        "api name": ""
+    }
+]

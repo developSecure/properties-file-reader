@@ -1,0 +1,851 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+	<sub-flow name="GetInvoiceDebitCreditHeadersSubflow" doc:id="086a4ed0-aa0e-4021-aab2-be83c75b5f20" >
+		<set-variable value='#["Select invoice debit credit Headers"]' doc:name="Set AUDIT logMessage - Select invoice debit credit Headers started" doc:id="761b74dc-e078-40a8-a25f-f7a3b45376aa" variableName="logMessage" />
+		<ee:transform doc:name="pickNoteNumber query parameter validation" doc:id="c06a2d51-64f6-429c-b3ac-5fc5b17f93f2" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="searchParams" ><![CDATA[%dw 2.0
+output application/json
+
+fun checkNull(value) = value default ""
+
+var pickNoteNumber = if(trim(checkNull(attributes.queryParams.pickNoteNumber)) matches(/^\d*/)) trim(attributes.queryParams.pickNoteNumber) else ""
+---
+{
+	(pickNoteNumber: "'$(pickNoteNumber)'") if(not isEmpty(pickNoteNumber))
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="ad5465ee-f164-491e-be6b-5516c9fb7b95" >
+			<when expression="#[attributes.queryParams.document_date != null]">
+				<ee:transform doc:name="Transform date" doc:id="2f25c5cb-a880-4b3f-bd22-d55b0b8fff36">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="process_moth"><![CDATA[%dw 2.0
+output application/json
+var orig_date = attributes.queryParams.document_date as Date{format:"yyyy-MM-dd"}
+var month = if(orig_date.month < 10)('0' ++ orig_date.month) else (orig_date.month)
+---
+(month ++ '.' ++ '01' ++ '.' ++ orig_date.year) as Date{format: 'MM.dd.yyyy'}]]></ee:set-variable>
+				<ee:set-variable variableName="invoice_date"><![CDATA[%dw 2.0
+output application/json
+var orig_date = attributes.queryParams.document_date as Date{format:"yyyy-MM-dd"}
+var month = if(orig_date.month < 10)('0' ++ orig_date.month) else (orig_date.month)
+var day = if(orig_date.day < 10)('0' ++ orig_date.day) else (orig_date.day)
+---
+(month ++ '.' ++ day ++ '.' ++ orig_date.year) as Date{format: 'MM.dd.yyyy'}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<ee:transform doc:name="Prepare SQL statement" doc:id="ece50478-182e-484c-8c14-209fbdab1bc9">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="sqlInvoiceHeaderAAHQuery" ><![CDATA[%dw 2.0
+output application/java
+var headers = "SELECT *
+FROM
+  (
+	SELECT rownum AS item_number, i.*
+	FROM
+	(
+		WITH
+		org AS
+		( 
+			SELECT 'A' AS company_id,
+				 'AAH Pharmaceuticals Ltd' AS company_name,
+				 'Paradise Way' AS address_line_1,
+				 'Sapphire Court' AS address_line_2,
+				 'Walsgrave Triangle' AS address_line_3,
+				 'Coventry' AS address_line_4,
+				 'CV2 2TX' AS postcode,
+				 'GB222516987' AS vat_number,
+				 '0123458' AS registration_number
+			FROM dual
+			UNION
+			SELECT 'E' AS company_id,
+				 'Enterprise' AS company_name,
+				 'Centurion Park' AS address_line_1,
+				 'Centurion Way' AS address_line_2,
+				 'Wilnecote' AS address_line_3,
+				 'Tamworth' AS address_line_4,
+				 'B77 5PZ' AS postcode,
+				 'GB222516987' AS vat_number,
+				 '0123458' AS registration_number
+			FROM   dual
+			UNION
+			SELECT 'T' AS company_id,
+				 'Trident Pharmaceuticals' AS company_name,
+				 'Centurion Park' AS address_line_1,
+				 'Centurion Way' AS address_line_2,
+				 'Wilnecote' AS address_line_3,
+				 'Tamworth' AS address_line_4,
+				 'B77 5PZ' AS postcode,
+				 'GB222516987' AS vat_number,
+				 '0123458' AS registration_number
+			FROM   dual ),
+			i AS
+		( 	
+			SELECT i.invoice_number,
+				 SUM(invoice_sales_value) AS net_subtotal,
+				 SUM(line_vat_value) AS tax_value
+			FROM   cpuser.f_aah_invoice i 
+			WHERE  process_month = to_date(:p_process_month, 'MM.DD.yyyy')
+			AND    omit_marker = '0'
+			AND    duplicate_flag = 'N'
+			GROUP BY i.invoice_number )
+			SELECT CASE h.company_id
+			WHEN 'A' THEN 'AAH'
+			WHEN 'E' THEN 'Enterprise'
+			WHEN 'T' THEN 'Trident'
+			ELSE
+				'Not Defined'
+			END AS brand,
+			CASE h.document_type
+			 WHEN 'I' THEN 'Invoice'
+			 WHEN 'C' THEN 'Credit'
+			ELSE
+				'Not Defined'
+			END AS document_type,
+			   org.company_name,
+			   org.address_line_1 AS legal_address_1,
+			   org.address_line_2 AS legal_address_2,
+			   org.address_line_3 AS legal_address_3,
+			   org.address_line_4 AS legal_address_4,
+			   org.postcode AS legal_postcode,
+				org.vat_number AS legal_vat_number,
+			   org.registration_number AS legal_reg_number,
+			   h.cust_key_c,
+			   h.cust_key_h,
+			   h.invoice_number,
+			   h.document_date,
+			   h.order_track_number,
+			   h.due_date AS invoice_due_date,
+			   h.customer_order_number,
+			   h.reference,
+			   h.pick_note_no as delivery_number,
+			   c.a_account_branch_id || c.a_account_id AS customer_number,
+			   c.a_account_name AS payer_customer_name,
+			   addr.address_line_1 AS payer_address_1,
+			   addr.address_line_2 AS payer_address_2,
+			   addr.address_line_3 AS payer_address_3,
+			   addr.address_line_4 AS payer_address_4,
+			   c.post_code AS payer_postcode,
+			   c.a_account_name AS sold_to_customer_name,
+			   addr.address_line_1 AS sold_to_address_1,
+			   addr.address_line_2 AS sold_to_address_2,
+			   addr.address_line_3 AS sold_to_address_3,
+			   addr.address_line_4 AS sold_to_address_4,
+			   c.post_code AS postcode,      
+			   ce.vat_no AS vat_number,
+			   i.net_subtotal,
+			   i.tax_value
+			FROM   cpuser.f_aah_invoice_head h,
+			   cpuser.d_aah_customer c,
+			   cpuser.d_customer_extra ce,
+			   lu_address addr,
+			   i,
+			   org
+			WHERE  h.cust_key_c = c.cust_key_c
+			AND    h.process_month = to_date(:p_process_month, 'MM.DD.yyyy')
+			AND    c.cust_key_c = addr.cust_key_c
+			AND    c.cust_key_c = ce.cust_key_c
+			AND    h.company_id = org.company_id
+			AND    h.duplicate_flag = 'N'
+			AND    h.invoice_number = i.invoice_number
+			AND    c.a_account_branch_id = :p_branch_id  
+			AND    c.a_account_id = :p_account_id    
+			AND    h.document_date = to_date(:p_invoice_date, 'MM.DD.yyyy') ) i )"
+fun constructWhereClause(inputData) =
+	inputData match {
+		case pickNoteNumber if inputData.pickNoteNumber? -> "\nWHERE delivery_number = $(vars.searchParams.pickNoteNumber)"
+		else -> ""
+}
+---
+headers ++ constructWhereClause(vars.searchParams)]]></ee:set-variable>
+						<ee:set-variable variableName="sqlInvoiceHeaderEntQuery" ><![CDATA[%dw 2.0
+output application/java
+
+var headers = "SELECT *
+FROM
+  (
+	SELECT rownum AS item_number, i.*
+	FROM
+	(
+		WITH
+		org AS
+		( 
+			SELECT 'A' AS company_id,
+				 'AAH Pharmaceuticals Ltd' AS company_name,
+				 'Paradise Way' AS address_line_1,
+				 'Sapphire Court' AS address_line_2,
+				 'Walsgrave Triangle' AS address_line_3,
+				 'Coventry' AS address_line_4,
+				 'CV2 2TX' AS postcode,
+				 'GB222516987' AS vat_number,
+				 '0123458' AS registration_number
+			FROM dual
+			UNION
+			SELECT 'E' AS company_id,
+				 'Enterprise' AS company_name,
+				 'Centurion Park' AS address_line_1,
+				 'Centurion Way' AS address_line_2,
+				 'Wilnecote' AS address_line_3,
+				 'Tamworth' AS address_line_4,
+				 'B77 5PZ' AS postcode,
+				 'GB222516987' AS vat_number,
+				 '0123458' AS registration_number
+			FROM   dual
+			UNION
+			SELECT 'T' AS company_id,
+				 'Trident Pharmaceuticals' AS company_name,
+				 'Centurion Park' AS address_line_1,
+				 'Centurion Way' AS address_line_2,
+				 'Wilnecote' AS address_line_3,
+				 'Tamworth' AS address_line_4,
+				 'B77 5PZ' AS postcode,
+				 'GB222516987' AS vat_number,
+				 '0123458' AS registration_number
+			FROM   dual ),
+			i AS
+		( 	
+			SELECT i.invoice_number,
+				 SUM(invoice_sales_value) AS net_subtotal,
+				 SUM(line_vat_value) AS tax_value
+			FROM   cpuser.F_ENT_TRI_INVOICE i 
+			WHERE  process_month = to_date(:p_process_month, 'MM.DD.yyyy')
+			AND    omit_marker = '0'
+			GROUP BY i.invoice_number )
+			SELECT CASE h.company_id
+			WHEN 'A' THEN 'AAH'
+			WHEN 'E' THEN 'Enterprise'
+			WHEN 'T' THEN 'Trident'
+			ELSE
+				'Not Defined'
+			END AS brand,
+			CASE h.document_type
+			 WHEN 'I' THEN 'Invoice'
+			 WHEN 'C' THEN 'Credit'
+			ELSE
+				'Not Defined'
+			END AS document_type,
+			   org.company_name,
+			   org.address_line_1 AS legal_address_1,
+			   org.address_line_2 AS legal_address_2,
+			   org.address_line_3 AS legal_address_3,
+			   org.address_line_4 AS legal_address_4,
+			   org.postcode AS legal_postcode,
+				org.vat_number AS legal_vat_number,
+			   org.registration_number AS legal_reg_number,
+			   h.cust_key_c,
+			   h.cust_key_h,
+			   h.invoice_number,
+			   h.document_date,
+			   h.order_track_number,
+			   h.due_date AS invoice_due_date,
+			   h.customer_order_number,
+			   h.reference,
+			   h.pick_note_no as delivery_number,
+			   c.a_account_branch_id || c.a_account_id AS customer_number,
+			   c.a_account_name AS payer_customer_name,
+			   addr.address_line_1 AS payer_address_1,
+			   addr.address_line_2 AS payer_address_2,
+			   addr.address_line_3 AS payer_address_3,
+			   addr.address_line_4 AS payer_address_4,
+			   c.post_code AS payer_postcode,
+			   c.a_account_name AS sold_to_customer_name,
+			   addr.address_line_1 AS sold_to_address_1,
+			   addr.address_line_2 AS sold_to_address_2,
+			   addr.address_line_3 AS sold_to_address_3,
+			   addr.address_line_4 AS sold_to_address_4,
+			   c.post_code AS postcode,      
+			   ce.vat_no AS vat_number,
+			   i.net_subtotal,
+			   i.tax_value
+			FROM   cpuser.F_ENT_TRI_INVOICE_HEAD h,
+			   cpuser.d_aah_customer c,
+			   cpuser.d_customer_extra ce,
+			   lu_address addr,
+			   i,
+			   org
+			WHERE  h.cust_key_c = c.cust_key_c
+			AND    h.process_month = to_date(:p_process_month, 'MM.DD.yyyy')
+			AND    c.cust_key_c = addr.cust_key_c
+			AND    c.cust_key_c = ce.cust_key_c
+			AND    h.company_id = org.company_id
+			AND    h.invoice_number = i.invoice_number
+			AND    c.a_account_branch_id = :p_branch_id  
+			AND    c.a_account_id = :p_account_id    
+			AND    h.document_date = to_date(:p_invoice_date, 'MM.DD.yyyy') ) i )"
+			
+fun constructWhereClause(inputData) =
+	inputData match {
+		case pickNoteNumber if inputData.pickNoteNumber? -> "\nWHERE delivery_number = $(vars.searchParams.pickNoteNumber)"
+		else -> ""
+}
+---
+headers ++ constructWhereClause(vars.searchParams)]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Choose appropriate query" doc:id="b9a6ce41-30db-498b-b8e9-58393f2343fc">
+					<ee:message>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="sqlInvoiceHeaderQuery" ><![CDATA[%dw 2.0
+output application/java
+---
+if (attributes.queryParams.customer_number[0 to 3] as String == "606R") vars.sqlInvoiceHeaderEntQuery else vars.sqlInvoiceHeaderAAHQuery]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			
+</when>
+			<when expression='#[attributes.queryParams.isNote == "true"]'>
+				<ee:transform doc:name="Transform date" doc:id="de5869f9-554f-408b-8842-57f81bb16454">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="startDate"><![CDATA[%dw 2.0
+output application/json
+var orig_date = attributes.queryParams.startDate as Date{format:"yyyy-MM-dd"}
+var month = if(orig_date.month < 10)('0' ++ orig_date.month) else (orig_date.month)
+var day = if(orig_date.day < 10)('0' ++ orig_date.day) else (orig_date.day)
+---
+(month ++ '.' ++ day ++ '.' ++ orig_date.year) as Date{format: 'MM.dd.yyyy'}]]></ee:set-variable>
+						<ee:set-variable variableName="endDate"><![CDATA[%dw 2.0
+output application/json
+var orig_date = attributes.queryParams.endDate as Date{format:"yyyy-MM-dd"}
+var month = if(orig_date.month < 10)('0' ++ orig_date.month) else (orig_date.month)
+var day = if(orig_date.day < 10)('0' ++ orig_date.day) else (orig_date.day)
+---
+((month ++ '.' ++ day ++ '.' ++ orig_date.year) as Date{format: 'MM.dd.yyyy'} + |P2M|) as Date{format: 'MM.dd.yyyy'}]]></ee:set-variable>
+						<ee:set-variable variableName="process_month_start"><![CDATA[%dw 2.0
+output application/json
+var orig_date = attributes.queryParams.startDate as Date{format:"yyyy-MM-dd"}
+var month = if(orig_date.month < 10)('0' ++ orig_date.month) else (orig_date.month)
+---
+(month ++ '.' ++ '01' ++ '.' ++ orig_date.year) as Date{format: 'MM.dd.yyyy'}]]></ee:set-variable>
+						<ee:set-variable variableName="process_month_end"><![CDATA[%dw 2.0
+output application/json
+var orig_date = attributes.queryParams.endDate as Date{format:"yyyy-MM-dd"}
+var month = if(orig_date.month < 10)('0' ++ orig_date.month) else (orig_date.month)
+---
+((month ++ '.' ++ '01' ++ '.' ++ orig_date.year) as Date{format: 'MM.dd.yyyy'} + |P2M|) as Date{format: 'MM.dd.yyyy'}]]></ee:set-variable>
+						<ee:set-variable variableName="isNote" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.isNote as String]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="sqlQuery" doc:id="86315ca3-2f5b-49ff-965f-0042e2795099">
+					<ee:message>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="sql" ><![CDATA[%dw 2.0
+output application/java
+---
+"SELECT 
+  invoice_number, 
+  document_date,
+  original_order_number as originalOrder
+FROM
+  cpuser.f_aah_invoice_head
+WHERE
+  process_month BETWEEN to_date(:p_process_month_start, 'MM.DD.yyyy')
+  AND to_date(:p_process_month_end, 'MM.DD.yyyy')
+  AND original_order_number IN (" ++ attributes.queryParams.invoiceList ++ ")
+  AND duplicate_flag = 'N'
+  AND document_type = 'C'
+  AND document_date BETWEEN to_date(:p_start_date, 'MM.DD.yyyy')
+  AND to_date(:p_end_date, 'MM.DD.yyyy')"
+
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</when>
+			<when expression='#[attributes.queryParams.isAAH == "true"]'>
+				<ee:transform doc:name="Prepare parameters for pagination" doc:id="6101256a-8e0a-49f7-ae86-0bf4b6b978fa">
+					<ee:message>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="pageParams" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	offset: attributes.queryParams.offset as Number default 0,
+	searchLimit: attributes.queryParams.searchLimit as Number default 0
+}
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Transform date" doc:id="437da3bc-ee08-402d-a55e-524c6d06744d" >
+					<ee:message />
+					<ee:variables >
+						<ee:set-variable variableName="optWhere" ><![CDATA[%dw 2.0
+output application/json
+var order = attributes.queryParams.orderNumber
+var invoice = if ((attributes.queryParams.invoiceNumber != null) and sizeOf(attributes.queryParams.invoiceNumber) == 9) (attributes.queryParams.invoiceNumber[0 to 7]) else attributes.queryParams.invoiceNumber
+var tracking = attributes.queryParams.order_track_number
+---
+(if (order != null and not isEmpty(order)) ("AND h.CUSTOMER_ORDER_NUMBER LIKE '" ++ order ++ "%'") else "") ++ 
+(if (tracking != null and not isEmpty(tracking)) (" AND h.ORDER_TRACK_NUMBER LIKE '" ++ tracking ++ "%'") else "") ++
+(if (invoice != null and not isEmpty(invoice)) (" AND h.INVOICE_NUMBER LIKE '" ++ invoice ++ "%'") else "") default ""]]></ee:set-variable>
+						<ee:set-variable variableName="dateRange" ><![CDATA[%dw 2.0
+import * from modules::globalFun
+import java!utils::PeriodUtil
+output application/json
+
+var start_date = formatDate(attributes.queryParams.startDate, "yyyy-MM-dd")
+var end_date = formatDate(attributes.queryParams.endDate, "yyyy-MM-dd")
+var start_month = editMonth(start_date,"yyyy-MM-dd")
+var end_month = editMonth(end_date, "yyyy-MM-dd")
+var numOfDays = daysBetween(start_date, end_date)
+var dateRange = ((0 to numOfDays) map(start_date + ("P$($$)D" as Period))) joinBy("','")
+var monthsCount = PeriodUtil::monthsBetween(start_month,end_month)
+var months = if(monthsCount > 0) ((0 to monthsCount - 1) map((start_month + ("P$($)M") as Period) as String{format:"dd-MMM-yy"})) else []
+---
+{
+	dates: "'$(dateRange)'",
+	months: if(sizeOf(months) > 0) ("'" ++ (months joinBy "','") ++ "'") else "''"
+}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="sqlQuery" doc:id="0080db8b-6fae-45a1-b2e0-0bdb0a264206">
+					<ee:message>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="sqlQuery" ><![CDATA[%dw 2.0
+output application/java
+var whereClause = "\nWHERE  item_number BETWEEN $(vars.pageParams.offset) AND $(vars.pageParams.searchLimit)"
+---
+"SELECT /*+ NO_PARALLEL */ *
+FROM
+  (
+SELECT rownum AS item_number, i.*, count(*) over() as total_count
+FROM
+(
+SELECT
+       CASE h.document_type
+         WHEN 'I' THEN 'Invoice'
+         WHEN 'C' THEN 'Credit'
+       ELSE
+         'Not Defined'
+       END AS document_type,
+       h.invoice_number,
+       h.document_date,
+       h.order_track_number,
+       h.customer_order_number,
+	   h.order_date_time,
+       c.a_account_branch_id || c.a_account_id AS customer_number
+FROM   cpuser.f_aah_invoice_head h,
+       cpuser.d_aah_customer c
+WHERE  h.cust_key_c = c.cust_key_c
+AND    h.process_month IN ($(vars.dateRange.months))
+AND    h.duplicate_flag = 'N'
+AND    c.a_account_branch_id = :p_branch_id
+AND    c.a_account_id = :p_account_id
+AND    h.document_type = 'I'
+AND    to_char(document_date, 'yyyy-MM-DD') IN ($(vars.dateRange.dates))
+$(vars.optWhere)) i )" ++ whereClause
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</when>
+			<when expression="#[attributes.queryParams.document_date == null and attributes.queryParams.startDate != null and attributes.queryParams.endDate != null and attributes.queryParams.isAAH == null]" >
+				<ee:transform doc:name="Transform date" doc:id="5e69ddbe-28df-474a-af91-f8d5b9e60205">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="startDate"><![CDATA[%dw 2.0
+output application/json
+var orig_date = attributes.queryParams.startDate as Date{format:"yyyy-MM-dd"}
+var month = if(orig_date.month < 10)('0' ++ orig_date.month) else (orig_date.month)
+var day = if(orig_date.day < 10)('0' ++ orig_date.day) else (orig_date.day)
+---
+(month ++ '.' ++ day ++ '.' ++ orig_date.year) as Date{format: 'MM.dd.yyyy'}]]></ee:set-variable>
+						<ee:set-variable variableName="endDate"><![CDATA[%dw 2.0
+output application/json
+var orig_date = attributes.queryParams.endDate as Date{format:"yyyy-MM-dd"}
+var month = if(orig_date.month < 10)('0' ++ orig_date.month) else (orig_date.month)
+var day = if(orig_date.day < 10)('0' ++ orig_date.day) else (orig_date.day)
+---
+(month ++ '.' ++ day ++ '.' ++ orig_date.year) as Date{format: 'MM.dd.yyyy'}]]></ee:set-variable>
+						<ee:set-variable variableName="process_month_start"><![CDATA[%dw 2.0
+output application/json
+var orig_date = attributes.queryParams.startDate as Date{format:"yyyy-MM-dd"}
+var month = if(orig_date.month < 10)('0' ++ orig_date.month) else (orig_date.month)
+---
+(month ++ '.' ++ '01' ++ '.' ++ orig_date.year) as Date{format: 'MM.dd.yyyy'}]]></ee:set-variable>
+						<ee:set-variable variableName="process_month_end"><![CDATA[%dw 2.0
+output application/json
+var orig_date = attributes.queryParams.endDate as Date{format:"yyyy-MM-dd"}
+var month = if(orig_date.month < 10)('0' ++ orig_date.month) else (orig_date.month)
+---
+(month ++ '.' ++ '01' ++ '.' ++ orig_date.year) as Date{format: 'MM.dd.yyyy'}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Prepare SQL statement" doc:id="9e93a02c-3166-4458-8474-789478a27a2e">
+					<ee:message />
+					<ee:variables>
+								<ee:set-variable variableName="sqlInvoiceHeadersAAHQuery"><![CDATA[%dw 2.0
+output application/java
+
+var headers = "SELECT /*+ NO_PARALLEL */ *
+FROM
+  (
+	SELECT rownum AS item_number, i.*
+	FROM
+	(
+		WITH
+		org AS
+		( 
+			SELECT 'A' AS company_id,
+				 'AAH Pharmaceuticals Ltd' AS company_name,
+				 'Paradise Way' AS address_line_1,
+				 'Sapphire Court' AS address_line_2,
+				 'Walsgrave Triangle' AS address_line_3,
+				 'Coventry' AS address_line_4,
+				 'CV2 2TX' AS postcode,
+				 'GB222516987' AS vat_number,
+				 '0123458' AS registration_number
+			FROM dual
+			UNION
+			SELECT 'E' AS company_id,
+				 'Enterprise' AS company_name,
+				 'Centurion Park' AS address_line_1,
+				 'Centurion Way' AS address_line_2,
+				 'Wilnecote' AS address_line_3,
+				 'Tamworth' AS address_line_4,
+				 'B77 5PZ' AS postcode,
+				 'GB222516987' AS vat_number,
+				 '0123458' AS registration_number
+			FROM   dual
+			UNION
+			SELECT 'T' AS company_id,
+				 'Trident Pharmaceuticals' AS company_name,
+				 'Centurion Park' AS address_line_1,
+				 'Centurion Way' AS address_line_2,
+				 'Wilnecote' AS address_line_3,
+				 'Tamworth' AS address_line_4,
+				 'B77 5PZ' AS postcode,
+				 'GB222516987' AS vat_number,
+				 '0123458' AS registration_number
+			FROM   dual ),
+		i AS
+		( 
+			SELECT i.invoice_number,
+            SUM(invoice_sales_value) AS net_subtotal,
+            SUM(line_vat_value) AS tax_value
+			FROM   cpuser.f_aah_invoice i 
+			WHERE  process_month BETWEEN to_date(:p_process_month_start, 'MM.DD.yyyy') AND to_date(:p_process_month_end, 'MM.DD.yyyy')
+			AND    omit_marker = '0'
+			AND    duplicate_flag = 'N'
+			GROUP BY i.invoice_number )
+		SELECT CASE h.company_id
+        WHEN 'A' THEN 'AAH'
+        WHEN 'E' THEN 'Enterprise'
+        WHEN 'T' THEN 'Trident'
+		ELSE
+         'Not Defined'
+		END AS brand,
+		CASE h.document_type
+        WHEN 'I' THEN 'Invoice'
+        WHEN 'C' THEN 'Credit'
+		ELSE
+         'Not Defined'
+		END AS document_type,
+		   org.company_name,
+		   org.address_line_1 AS legal_address_1,
+		   org.address_line_2 AS legal_address_2,
+		   org.address_line_3 AS legal_address_3,
+		   org.address_line_4 AS legal_address_4,
+		   org.postcode AS legal_postcode,
+		   org.vat_number AS legal_vat_number,
+		   org.registration_number AS legal_reg_number,
+		   h.cust_key_c,
+		   h.cust_key_h,
+		   h.invoice_number,
+		   h.document_date,
+		   h.order_track_number,
+		   h.due_date AS invoice_due_date,
+		   h.customer_order_number,
+		   h.reference,
+		   h.pick_note_no as delivery_number,
+		   c.a_account_branch_id || c.a_account_id AS customer_number,
+		   c.a_account_name AS payer_customer_name,
+		   addr.address_line_1 AS payer_address_1,
+		   addr.address_line_2 AS payer_address_2,
+		   addr.address_line_3 AS payer_address_3,
+		   addr.address_line_4 AS payer_address_4,
+		   c.post_code AS payer_postcode,
+		   c.a_account_name AS sold_to_customer_name,
+		   addr.address_line_1 AS sold_to_address_1,
+		   addr.address_line_2 AS sold_to_address_2,
+		   addr.address_line_3 AS sold_to_address_3,
+		   addr.address_line_4 AS sold_to_address_4,
+		   c.post_code AS postcode,      
+		   ce.vat_no AS vat_number,
+		   i.net_subtotal,
+		   i.tax_value
+		FROM   cpuser.f_aah_invoice_head h,
+		   cpuser.d_aah_customer c,
+		   cpuser.d_customer_extra ce,
+		   lu_address addr,
+		   i,
+		   org
+	WHERE  h.cust_key_c = c.cust_key_c
+	AND    h.process_month  BETWEEN to_date(:p_process_month_start, 'MM.DD.yyyy') AND to_date(:p_process_month_end, 'MM.DD.yyyy')
+	AND    c.cust_key_c = addr.cust_key_c
+	AND    c.cust_key_c = ce.cust_key_c
+	AND    h.company_id = org.company_id
+	AND    h.duplicate_flag = 'N'
+	AND    h.invoice_number = i.invoice_number
+	AND    c.a_account_branch_id = :p_branch_id  
+	AND    c.a_account_id = :p_account_id    
+	AND    h.document_date BETWEEN to_date(:p_start_date, 'MM.DD.yyyy') AND to_date(:p_end_date, 'MM.DD.yyyy')) i )"
+
+fun constructWhereClause(inputData) =
+	inputData match {
+		case pickNoteNumber if inputData.pickNoteNumber? -> "\nWHERE delivery_number = $(vars.searchParams.pickNoteNumber)"
+		else -> ""
+}
+---
+headers ++ constructWhereClause(vars.searchParams)]]></ee:set-variable>
+								<ee:set-variable variableName="sqlInvoiceHeadersEntQuery"><![CDATA[%dw 2.0
+output application/java
+
+var headers = "SELECT /*+ NO_PARALLEL */ *
+FROM
+  (
+	SELECT rownum AS item_number, i.*
+	FROM
+	(
+		WITH
+		org AS
+		( 
+			SELECT 'A' AS company_id,
+				 'AAH Pharmaceuticals Ltd' AS company_name,
+				 'Paradise Way' AS address_line_1,
+				 'Sapphire Court' AS address_line_2,
+				 'Walsgrave Triangle' AS address_line_3,
+				 'Coventry' AS address_line_4,
+				 'CV2 2TX' AS postcode,
+				 'GB222516987' AS vat_number,
+				 '0123458' AS registration_number
+			FROM dual
+			UNION
+			SELECT 'E' AS company_id,
+				 'Enterprise' AS company_name,
+				 'Centurion Park' AS address_line_1,
+				 'Centurion Way' AS address_line_2,
+				 'Wilnecote' AS address_line_3,
+				 'Tamworth' AS address_line_4,
+				 'B77 5PZ' AS postcode,
+				 'GB222516987' AS vat_number,
+				 '0123458' AS registration_number
+			FROM   dual
+			UNION
+			SELECT 'T' AS company_id,
+				 'Trident Pharmaceuticals' AS company_name,
+				 'Centurion Park' AS address_line_1,
+				 'Centurion Way' AS address_line_2,
+				 'Wilnecote' AS address_line_3,
+				 'Tamworth' AS address_line_4,
+				 'B77 5PZ' AS postcode,
+				 'GB222516987' AS vat_number,
+				 '0123458' AS registration_number
+			FROM   dual ),
+		i AS
+		( 
+			SELECT i.invoice_number,
+            SUM(invoice_sales_value) AS net_subtotal,
+            SUM(line_vat_value) AS tax_value
+			FROM   cpuser.F_ENT_TRI_INVOICE i 
+			WHERE  process_month BETWEEN to_date(:p_process_month_start, 'MM.DD.yyyy') AND to_date(:p_process_month_end, 'MM.DD.yyyy')
+			AND    omit_marker = '0'
+			GROUP BY i.invoice_number )
+		SELECT CASE h.company_id
+        WHEN 'A' THEN 'AAH'
+        WHEN 'E' THEN 'Enterprise'
+        WHEN 'T' THEN 'Trident'
+		ELSE
+         'Not Defined'
+		END AS brand,
+		CASE h.document_type
+        WHEN 'I' THEN 'Invoice'
+        WHEN 'C' THEN 'Credit'
+		ELSE
+         'Not Defined'
+		END AS document_type,
+		   org.company_name,
+		   org.address_line_1 AS legal_address_1,
+		   org.address_line_2 AS legal_address_2,
+		   org.address_line_3 AS legal_address_3,
+		   org.address_line_4 AS legal_address_4,
+		   org.postcode AS legal_postcode,
+		   org.vat_number AS legal_vat_number,
+		   org.registration_number AS legal_reg_number,
+		   h.cust_key_c,
+		   h.cust_key_h,
+		   h.invoice_number,
+		   h.document_date,
+		   h.order_track_number,
+		   h.due_date AS invoice_due_date,
+		   h.customer_order_number,
+		   h.reference,
+		   h.pick_note_no as delivery_number,
+		   c.a_account_branch_id || c.a_account_id AS customer_number,
+		   c.a_account_name AS payer_customer_name,
+		   addr.address_line_1 AS payer_address_1,
+		   addr.address_line_2 AS payer_address_2,
+		   addr.address_line_3 AS payer_address_3,
+		   addr.address_line_4 AS payer_address_4,
+		   c.post_code AS payer_postcode,
+		   c.a_account_name AS sold_to_customer_name,
+		   addr.address_line_1 AS sold_to_address_1,
+		   addr.address_line_2 AS sold_to_address_2,
+		   addr.address_line_3 AS sold_to_address_3,
+		   addr.address_line_4 AS sold_to_address_4,
+		   c.post_code AS postcode,      
+		   ce.vat_no AS vat_number,
+		   i.net_subtotal,
+		   i.tax_value
+		FROM   cpuser.F_ENT_TRI_INVOICE_HEAD h,
+		   cpuser.d_aah_customer c,
+		   cpuser.d_customer_extra ce,
+		   lu_address addr,
+		   i,
+		   org
+	WHERE  h.cust_key_c = c.cust_key_c
+	AND    h.process_month  BETWEEN to_date(:p_process_month_start, 'MM.DD.yyyy') AND to_date(:p_process_month_end, 'MM.DD.yyyy')
+	AND    c.cust_key_c = addr.cust_key_c
+	AND    c.cust_key_c = ce.cust_key_c
+	AND    h.company_id = org.company_id
+	AND    h.invoice_number = i.invoice_number
+	AND    c.a_account_branch_id = :p_branch_id  
+	AND    c.a_account_id = :p_account_id    
+	AND    h.document_date BETWEEN to_date(:p_start_date, 'MM.DD.yyyy') AND to_date(:p_end_date, 'MM.DD.yyyy')) i )"
+
+fun constructWhereClause(inputData) =
+	inputData match {
+		case pickNoteNumber if inputData.pickNoteNumber? -> "\nWHERE delivery_number = $(vars.searchParams.pickNoteNumber)"
+		else -> ""
+}
+---
+headers ++ constructWhereClause(vars.searchParams)]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Choose appropriate query" doc:id="a808b845-ae49-442a-adc1-1bddd6a5904d">
+							<ee:message>
+							</ee:message>
+							<ee:variables>
+								<ee:set-variable variableName="sqlInvoiceHeadersQuery"><![CDATA[%dw 2.0
+output application/java
+---
+if (attributes.queryParams.customer_number[0 to 3] as String == "606R") vars.sqlInvoiceHeadersEntQuery else vars.sqlInvoiceHeadersAAHQuery]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+			
+</when>
+		</choice>
+        <set-variable value='#[%dw 2.0
+        output application/json
+---
+{
+	processStatus : "Invoice headers received",
+	collectionSize : sizeOf(payload)
+}]' doc:name="Set AUDIT logMessage  Invoice debit credit headers- Invoices received" doc:id="f9ab3787-e265-4e3c-a8c4-f59293e56751" variableName="logMessage" />
+		<choice doc:name="Choice" doc:id="3f0caf68-bbd4-4112-b724-6a0ad14ef10f" >
+			<when expression='#[vars.isNote == "true"]'>
+				<ee:transform doc:name="Convert received collections from Java to JSON" doc:id="718f7ae3-bed1-4d42-bcbc-86d5892dd2e7" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{"headers": payload map (result) -> {
+	"invoiceNumber": result.INVOICE_NUMBER as String default "",
+    "invoiceDate": result.DOCUMENT_DATE as LocalDateTime {format: "yyyy-MM-dd'T'HH:mm:ss"} as String {format: "yyyy-MM-dd"},
+    "originalOrder": result.ORIGINALORDER as String default ""
+ }
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="invoice_headers" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Convert received collections from Java to JSON" doc:id="21386da3-21e4-4f05-908a-886c074a469a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{"headers": payload map (result) -> {
+	"invoiceNumber": result.INVOICE_NUMBER as String default "",
+    "itemNumber": result.ITEM_NUMBER default 1,
+    "brand": result.BRAND default "",
+    "documentType": result.DOCUMENT_TYPE default "",
+    "companyName": result.COMPANY_NAME default "",
+    "orderTrackingNumber": result.ORDER_TRACK_NUMBER default "",
+    "invoiceDate": result.DOCUMENT_DATE as LocalDateTime {format: "yyyy-MM-dd'T'HH:mm:ss"} as String {format: "yyyy-MM-dd"},
+    "salesOrderNumber": trim(result.CUSTOMER_ORDER_NUMBER) default "",
+    "originalInvoiceReference": result.REFERENCE default "",
+    "deliveryNumber": result.DELIVERY_NUMBER as String default "",
+    "customerNumber": result.CUSTOMER_NUMBER default "",
+    "pickNoteNumber": result.DELIVERY_NUMBER as String default "",
+    "netSubtotal": if(result.NET_SUBTOTAL != null and result.NET_SUBTOTAL != 0) (result.NET_SUBTOTAL as Number as String {format: "0.000"}) as Number {format: "0.000"} else 0.000,
+    "taxValue": if(result.TAX_VALUE != null and result.TAX_VALUE != 0) (result.TAX_VALUE as Number as String {format: "0.000"}) as Number {format: "0.000"} else 0.000,
+    "sourceSystem": "BIDWH",
+    "orderRaisedDate": result.ORDER_DATE_TIME,
+    "payer": ""
+
+},
+("total_count": payload[0].TOTAL_COUNT) if (payload[0].TOTAL_COUNT != null)
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="invoice_headers"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+			</otherwise>
+		</choice>
+		<set-variable value='#["Invoice headers Records processing completed"]' doc:name="Set AUDIT logMessage - Records processing completed" doc:id="70d5aca2-06eb-46b5-8835-6263c9e1d2c8" variableName="logMessage" />
+	</sub-flow>
+	<flow name="backOrderCancellation" doc:id="262bbf21-d451-408b-b0cb-2017bc1c5425" >
+		<ee:transform doc:name="Transform Message" doc:id="b119e206-49e1-45ca-92b0-ba0d74fe1531" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"backOrderCancellation"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<sub-flow name="testSubFlow" doc:id="5c779eea-f1d3-41d0-a2c9-85463cc083e7" >
+		<ee:transform doc:name="Transform Message" doc:id="8d7a7126-7309-48af-9773-ae051474b794" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	
+
+
+</mule>

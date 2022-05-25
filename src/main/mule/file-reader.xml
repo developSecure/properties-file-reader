@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
 	<sub-flow name="file-writerSubFlow" doc:id="10f70933-6328-4a6a-8f61-faf0c708e568" >
 		<ee:transform doc:name="Transform Message" doc:id="0157fc06-8a6f-4030-a3c0-7c677af37e39" >
 			<ee:message >
@@ -13,7 +14,8 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 output application/json
 ---
 {
-	Properties: flatten(vars.totalProperties)
+	Properties: flatten(vars.totalProperties),
+	EmptyLine: []
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
@@ -24,11 +26,13 @@ output application/xlsx header=true
 payload]]]></file:content>
 		</file:write>
 	</sub-flow>
-	<flow name="folders-readerSubFlow" doc:id="089aff75-83e1-402b-9076-1601f063d7b4" >
+	<sub-flow name="folders-readerSubFlow" doc:id="f67973cf-2b1f-40d6-8555-cdccb97b0c04">
 		<set-variable value="#[[] as Array]" doc:name="Prepare var for all api properties result" doc:id="a307e4ce-3428-4f6f-a961-b38284955778" variableName="totalProperties" />
-		<foreach doc:name="For Each" doc:id="55035f78-f72a-40d1-90b4-a459e8baabab" collection="#[p('projects.namelist') splitBy &quot;,&quot;]">
-			<set-variable value='#[payload]' doc:name="Set api name" doc:id="e44fe169-cba2-4c99-bfcd-cb11c3d482e8" variableName="apiName" />
-			<ee:transform doc:name="set file path" doc:id="d7f5890c-581f-4d60-9dc6-3df0e75759b5">
+		<set-variable value="#[payload.configFiles default []]" doc:name="Save config file names to var" doc:id="945c3717-869c-4cff-8088-b4d117ce4e79" variableName="fileList" />
+		<set-variable value='#[payload.operation default "write"]' doc:name="Set Variable" doc:id="2d2829eb-36b2-4b99-b98e-9c5c1c0d3ac9" variableName="operation" />
+		<foreach doc:name="For Each" doc:id="38e7e153-ae8b-401c-9d5c-afeffc73415a" collection="#[payload.apiNames]">
+			<set-variable value='#[payload]' doc:name="Set api name" doc:id="f20e99a3-806c-4429-87b6-519e24f8657e" variableName="apiName" />
+			<ee:transform doc:name="set file path" doc:id="8dd488f7-9756-4bc2-a549-a05e43e57b08">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -38,14 +42,19 @@ output application/json
 payload ++ p('folder.path')]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-			<set-variable value="#[[] as Array]" doc:name="Prepare var for property keys" doc:id="423e739d-1f1d-4ca3-9ffc-01122ac35257" variableName="propKeys" />
-			<set-variable value="#[{} as Object]" doc:name="Prepare var for summary properties results" doc:id="4c74e1cf-35c1-4568-9723-c0ebd6c2ace5" variableName="sumResults" />
-			<foreach doc:name="For Each" doc:id="d6b7d338-ffdc-47ba-80a5-6327ef33f7e0" collection="#[p('property.fileList') splitBy &quot;,&quot;]">
-			<set-variable value="#[payload]" doc:name="Set fileName" doc:id="c246c4a6-569f-47b1-b815-3db5eae2801c" variableName="fileName"/>
-				<choice doc:name="Choice" doc:id="ee3077aa-f652-41a9-bf30-33291f34ecac">
+			<choice doc:name="Choice" doc:id="9b66345e-950c-4720-91b5-0a1c14dd5d61" >
+				<when expression="#[isEmpty(vars.fileList)]">
+					<file:list doc:name="List" doc:id="58017fad-1178-42eb-9c0f-d8109c3ce4b8" config-ref="File_Config" directoryPath="#[vars.filePath]" target="fileList" targetValue="#[payload..fileName]" />
+				</when>
+			</choice>
+			<set-variable value="#[[] as Array]" doc:name="Prepare var for property keys" doc:id="06b4e36b-3ea4-42b3-8646-387388035795" variableName="propKeys" />
+			<set-variable value="#[{} as Object]" doc:name="Prepare var for summary properties results" doc:id="b96788e7-b40f-4928-9974-9411c6b91b48" variableName="sumResults" />
+			<foreach doc:name="For Each" doc:id="f5a0ddc9-b407-460c-a4e3-5b63d71d95aa" collection="#[vars.fileList default []]">
+			<set-variable value="#[payload]" doc:name="Set fileName" doc:id="bd21fe27-13ea-4063-9f9c-d70a9b548b30" variableName="fileName"/>
+				<choice doc:name="Choice" doc:id="f016500f-c916-43b1-b9e6-51136d27d15f">
 					<when expression="#[matches(vars.fileName, /^[a-z]+?\-[a-z]+?\.yaml/)]">
-						<file:read doc:name="Read" doc:id="5312427d-ede2-4a42-8ccc-22415a6804ae" config-ref="File_Config" path='#[vars.filePath ++ vars.fileName]' outputMimeType="application/yaml" />
-						<ee:transform doc:name="Convert yaml to json" doc:id="29147578-6f5c-4490-90dc-ccbabec48d21" >
+						<file:read doc:name="Read" doc:id="9ae41b00-ad7e-4bd3-a056-f13451a63e04" config-ref="File_Config" path='#[vars.filePath ++ vars.fileName]' outputMimeType="application/yaml" />
+						<ee:transform doc:name="Convert yaml to json" doc:id="951989b6-dac9-433b-9d87-a1ed5e7a4023" >
 							<ee:message >
 								<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -53,7 +62,7 @@ output application/json
 payload]]></ee:set-payload>
 							</ee:message>
 						</ee:transform>
-						<ee:transform doc:name="Get keys and values" doc:id="4cd6a038-1e81-44db-b889-bda2c5ad73a7" >
+						<ee:transform doc:name="Get keys and values" doc:id="160c0efc-2136-4a9a-a5d3-25db74a5ad23" >
 							<ee:message >
 								<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -65,7 +74,7 @@ payload mapLeafValues () -> {
 }]]></ee:set-payload>
 							</ee:message>
 						</ee:transform>
-						<ee:transform doc:name="Save keys to var" doc:id="0fefa8c3-6817-46cd-bd39-9d5b7e1d8b8e">
+						<ee:transform doc:name="Save keys to var" doc:id="a953c2ed-1343-423d-a973-597b1334009e">
 									<ee:message />
 									<ee:variables>
 										<ee:set-variable variableName="propKeys"><![CDATA[%dw 2.0
@@ -74,7 +83,7 @@ output application/json
 payload..key]]></ee:set-variable>
 									</ee:variables>
 								</ee:transform>
-						<ee:transform doc:name="Prepare property output structure" doc:id="76b953e6-7b6c-433b-951a-c263d6a7d89b" >
+						<ee:transform doc:name="Prepare property output structure" doc:id="93cf8cd0-310a-4103-9f64-12339611e74a" >
 							<ee:message >
 								<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -88,7 +97,7 @@ var values = payload..value
 							</ee:message>
 							<ee:variables />
 						</ee:transform>
-						<ee:transform doc:name="Transform Message" doc:id="fdfe2a8f-e0f2-4f14-884c-4ee8022297e7" >
+						<ee:transform doc:name="Transform Message" doc:id="d441e710-5249-406d-80d4-8fa7425ae154" >
 							<ee:message />
 							<ee:variables >
 								<ee:set-variable variableName="sumResults" ><![CDATA[%dw 2.0
@@ -100,7 +109,7 @@ vars.sumResults ++ payload]]></ee:set-variable>
 				</when>
 			</choice>
 		</foreach>
-			<ee:transform doc:name="Prepare payload for writing to xlsx file" doc:id="10c12c4a-309b-4a34-b35f-03d6e21f6233">
+			<ee:transform doc:name="Prepare payload for writing to xlsx file" doc:id="f838fb8e-9a27-4b26-9b4d-aeea5bb3dca7">
 					<ee:message>
 					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -121,7 +130,7 @@ propKeysAll map(key,index) -> {
 				<ee:variables >
 				</ee:variables>
 				</ee:transform>
-			<ee:transform doc:name="Transform Message" doc:id="04cd5df6-6419-4ce9-9d94-be6d02c7378c" >
+			<ee:transform doc:name="add indentation rows" doc:id="5d640e4a-7633-4f9b-9003-6b9b2ff7fe0f" >
 				<ee:message >
 					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -135,7 +144,7 @@ var emptyRow = [{
 payload ++ emptyRow]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
-			<ee:transform doc:name="Transform Message" doc:id="e33104d7-4d92-4ba4-94aa-852ea758322c">
+			<ee:transform doc:name="Transform Message" doc:id="0b1d3e09-9998-4e72-9c66-87ea02f876be">
 				<ee:message>
 				</ee:message>
 				<ee:variables>
@@ -146,6 +155,754 @@ vars.totalProperties + payload]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</foreach>
-		<flow-ref doc:name="file-writerSubFlow" doc:id="5bdf2000-ba9c-4dfb-8c4d-7e18befe9f1b" name="file-writerSubFlow"/>
-	</flow>
+		<choice doc:name="Choice" doc:id="dca99920-6cc2-4001-874b-e8108d20e604" >
+			<when expression='#[lower(vars.operation) == "read"]'>
+				<ee:transform doc:name="Prepare response" doc:id="7aca37d6-05d4-4825-be1e-15ebd5166dd1" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+flatten(vars.totalProperties)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="file-writerSubFlow" doc:id="0ebc8e85-a0a7-4fcc-86c5-3510f21bfb05" name="file-writerSubFlow" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="fileWriteSubFlow" doc:id="67356df7-c7c5-4318-8dab-cf500ae570af" >
+		<ee:transform doc:name="leftjoin() ea and pa" doc:id="57aa7e42-8c93-43ea-a932-910a8cf06127" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+import * from dw::core::Arrays
+output application/json
+---
+leftJoin(vars.experienceApis,vars.processApis,
+	(ea) -> appendIfMissing('$((vars.globalConfigs filter $..httpRequestConfigName[ea] == 
+ea..httpRequestConfigRef[0] and $..currentApiName == ea..apiName)[0].requestApiFullName)_',
+ea..httpRequestPath[0]) default "", 
+	(pa) -> appendIfMissing('$(pa..apiName[0])_',
+		pa..httpListenerPath[0]
+	) default ""
+)]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Mapping merge result ea_pa" doc:id="a3ba12c4-58a4-4efa-a64e-7004cdd3dcf6" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="ea_pa" ><![CDATA[%dw 2.0
+output application/json
+---
+payload map {
+	ea_path: $.l..httpListenerPath[0],
+	ea_name: $.l..apiName[0],
+	pa_path: $.r..httpListenerPath[0],
+	pa_name: $.r..apiName[0]
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="join() pa and sa" doc:id="b7151a20-0afc-4ee4-8027-379f175a8eb4" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="mergeProcessSystemApis" ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+import * from dw::core::Arrays
+output application/json
+---
+leftJoin(vars.processApis,vars.systemApis,
+	(pa) -> appendIfMissing('$((vars.globalConfigs filter $..httpRequestConfigName[0] == 
+pa..httpRequestConfigRef[0] and $..currentApiName == pa..apiName)[0].requestApiFullName)_' default "",
+pa..httpRequestPath[0]), 
+	(sa) -> appendIfMissing('$(sa..apiName[0])_' default "",
+		sa..httpListenerPath[0]
+	)
+)]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Mapping merge result pa and sa" doc:id="2f9cb3ff-27a9-46c8-a8da-20395c751d43" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="pa_sa" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.mergeProcessSystemApis map {
+	pa_path: $.l..httpListenerPath[0],
+	pa_name: $.l..apiName[0],
+	sa_path: $.r..httpListenerPath[0],
+	sa_name: $.r..apiName[0]
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Prepare xlsx structure for flows" doc:id="ff483a90-f76b-48ac-a752-960708176565">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="totalApiFlows"><![CDATA[%dw 2.0
+import * from dw::core::Strings
+import * from dw::core::Arrays
+output application/json
+
+---
+"API_Details": vars.ea_pa map {
+	'#': $$ + 1,
+	Exp_API_endpoint: $.ea_path,
+	Exp_API_name: $.ea_name,
+	Process_API_endpoint: $.pa_path,
+	Process_API_name: $.pa_name,
+	System_API_endpoint: (vars.pa_sa filter((v)-> v.pa_path == $.pa_path and v.pa_name == $.pa_name))..sa_path joinBy (",\n"),
+	System_API_name: (vars.pa_sa filter((v)-> v.pa_path == $.pa_path and v.pa_name == $.pa_name))..sa_name[0]
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Join schedulers with systemApis" doc:id="a5ddb3db-3244-46f1-9d03-897f2a6a5f34" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+import * from dw::core::Arrays
+output application/json
+---
+vars.schedulers map {
+	apiName: $..apiName[0],
+    httpListenerPath: $..httpListenerPath[0],
+    components: leftJoin(flatten($..components),vars.systemApis,
+	(sc) -> appendIfMissing('$(sc..requestApi[0])_' default "", sc..httpRequestPath[0]),
+	(sa) -> appendIfMissing('$(sa..apiName[0])_' default "", sa..httpListenerPath[0]))
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Prepare xlsx structure for schedulers" doc:id="b063f88e-9054-476b-b377-3af38efe2e4c" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="totalApiFlows" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.totalApiFlows ++ {
+	Shedulers_Details: [{
+		Exp_API_endpoint: "test",
+		Exp_API_name: "test",
+		Process_API_endpoint: "test",
+		Process_API_name: "test",
+		System_API_endpoint: "test",
+		System_API_name: "test"
+	}]
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Prepare xlsx structure for httPaths per API" doc:id="0c5c1d73-ed01-4f70-8889-06d2bb850886" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.totalApiFlows ++ (
+	Summary_API_Calls: vars.pathCount map {
+		'#': $$ + 1,
+		API_Name: $.apiName,
+		Schedulers: $.pathSchedulerCount,
+		Flow_Endpoints: $.pathFlowCount
+})]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<file:write doc:name="write" doc:id="18d226ab-5732-4b7a-8d2a-9528b4d02588" config-ref="File_Config" path='#["api_flows_output.xlsx"]' >
+			<file:content ><![CDATA[#[%dw 2.0 
+output application/xlsx header=true
+---
+payload]]]></file:content>
+		</file:write>
+	</sub-flow>
+	<sub-flow name="makeFilePathSubFlow" doc:id="cf9d30c3-1b0c-4f92-9d8d-c010bf9bc138" >
+		<set-variable value="#[payload]" doc:name="Set fileName" doc:id="5d41a5bf-6db8-45c0-ba82-71120c20ef08" variableName="fileName" />
+		<set-variable value="#[output application/java ---p('workingDirectory') ++ vars.filePath ++ vars.fileName]" doc:name="Set full file path" doc:id="8fe9b0cf-a681-44a9-b213-9b9a06857369" variableName="fullFilePath" />
+	</sub-flow>
+	<sub-flow name="readExcludedFlowsSubFlow" doc:id="b01f78f1-5522-4541-b0f9-8a11a76a9516" >
+		<foreach doc:name="For Each" doc:id="1557588a-133d-46e8-946c-9d0b886002cd" collection="#[vars.excludedImplFlows default []]">
+			<set-variable value="#[payload]" doc:name="Save flow with corrupted httpRequestPath" doc:id="4ef15bd3-1e00-4eb6-9fe9-a4cff38bdd15" variableName="corruptedFlow"/>
+			<ee:transform doc:name="Filter apiFile by flowName" doc:id="91a38a4a-4243-41ee-a240-92fe6d3deae7">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.apiFile.flows filter $..flowRefName[0] == payload.key]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			<foreach doc:name="For Each" doc:id="70f885e0-0701-418b-8412-8a78f2a0500f" >
+				<ee:transform doc:name="Replace httpRequestPath with valid value" doc:id="d7b7731b-911e-4895-ac13-45c546c878c0">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+import * from dw::util::Values
+import * from dw::core::Strings
+import * from modules::globalFun
+output application/json
+---
+vars.corruptedFlow mapObject(value,key) -> 
+	if (key ~= "flowComponents") 
+    {(key): value map {
+			c: $ mapObject(v,k) ->
+				if (k ~= "componentAttributes")
+					{(k): 
+						v update "httpRequestPath"  with trimString(payload..flowName[0]) 	
+					}
+				else
+					{(k): v}
+		}.c
+	}
+  else 
+    {(key): value}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+				<ee:transform doc:name="Put replaced obj to implFlows" doc:id="41a860ad-d6e9-4d4c-8a70-df3d7092400d" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="implFlows" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.implFlows << payload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</foreach>
+			<ee:transform doc:name="Remove corrupted flow from excludedImplFlows" doc:id="f7903a87-d3d9-4c81-9d7f-335fb71c3743">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="excludedImplFlows"><![CDATA[%dw 2.0
+output application/json
+---
+vars.excludedImplFlows - vars.corruptedFlow]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		</foreach>
+		<remove-variable doc:name="corruptedFlow" doc:id="173197f1-5c2b-40e1-b9fd-aa9f55249c58" variableName="corruptedFlow" />
+	</sub-flow>
+	<sub-flow name="readSchedulerSubFlows" doc:id="a487448f-780f-45c7-a0f0-745f63af9107">
+		<set-variable value="#[[] as Array]" doc:name="totalFlows" doc:id="654dbb88-2a88-4b18-a17c-8e8667b8c3f5" variableName="totalFlows" />
+		<foreach doc:name="For Each" doc:id="09ff3329-285e-434c-b8b5-9ddb6238295f" collection="#[flatten(payload.schedulers)]">
+			<foreach doc:name="For Each" doc:id="0242a847-127f-4458-97df-9d172ed8f2c5" collection="#[payload.flowComponents]">
+				<set-variable value="#[[] as Array]" doc:name="requestComponents" doc:id="b8f04df0-f4e1-41d7-b9fd-627185243f99" variableName="requestComponents" />
+				<set-variable value='#[payload.componentName default ""]' doc:name="apiFlowName" doc:id="e0dbaaa2-ac0e-4f42-b524-3558d9781a4b" variableName="apiFlowName" />
+				<ee:transform doc:name="Set httpListenerPath" doc:id="e910c367-7f91-4766-8a9c-846d5bf0f362">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="httpListenerPath"><![CDATA[%dw 2.0
+import * from dw::core::Strings
+import * from modules::globalFun
+output application/json
+---
+replaceAll(replaceAll(trimString(payload..flowName[0]),"(","{"),")","}") default "scheduler_trigger"]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Find implFlow equals apiFlowName" doc:id="87d2390d-ad41-4597-adbe-37ec52d6ccac" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+(vars.implFlows filter((value) -> (value.key == vars.apiFlowName)))[0]]]></ee:set-payload>
+					</ee:message>
+					<ee:variables />
+				</ee:transform>
+				<choice doc:name="Choice" doc:id="4471e4f0-78ee-43d0-b274-2738fa9c1c03" >
+					<when expression="#[not payload == null]">
+						<flow-ref doc:name="while-loopSubFlow" doc:id="a7405677-67a3-4d28-9d6c-c24c8a66a9e2" name="while-loopSubFlow" />
+						<ee:transform doc:name="Put apiFlowResult to totalFlows var" doc:id="acc87384-75e8-42a6-a9d2-3a58747d5014">
+				<ee:message />
+				<ee:variables>
+					<ee:set-variable variableName="totalFlows"><![CDATA[%dw 2.0
+output application/json
+var flow = {
+	'$(vars.apiFlowName)': {
+		apiName: vars.apiName,
+		httpListenerPath: vars.httpListenerPath default "",
+		components: vars.requestComponents
+	}
+}
+---
+vars.totalFlows << flow]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+					</when>
+				</choice>
+			</foreach>
+		</foreach>
+		<ee:transform doc:name="Set to schedulers" doc:id="faf0b1dc-1a78-40e4-b00f-43b70748738a" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="schedulers" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.schedulers ++ vars.totalFlows]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<remove-variable doc:name="totalFlows" doc:id="8c3c0af7-e1ee-480e-9db1-5eb960f4e5e6" variableName="totalFlows"/>
+		<remove-variable doc:name="requestComponents" doc:id="47e32499-5780-4a88-b906-2af10f8ed434" variableName="requestComponents" />
+		<remove-variable doc:name="apiFlowName" doc:id="5289ae5a-886f-407c-b22d-c06bdf1c4c5f" variableName="apiFlowName"/>
+		<remove-variable doc:name="httpListenerPath" doc:id="43fb0e71-5378-43d1-888d-3f65ecd63745" variableName="httpListenerPath"/>
+	</sub-flow>
+	<sub-flow name="readImplFileSubFlow" doc:id="a3bbe2aa-d25f-4623-9fb9-a8f4128e7683" >
+		<set-variable value="#[[] as Array]" doc:name="totalFlows" doc:id="0007657d-1dea-455a-b133-d564328e3627" variableName="totalFlows" />
+		<foreach doc:name="Traversing all apiFlows" doc:id="238eb662-f50f-4685-aec3-7168fe43ffdb" collection="#[vars.apiFile.flows default []]">
+			<set-variable value="#[[] as Array]" doc:name="requestComponents" doc:id="ca58d5cd-3b81-4c9e-ba28-e1b862297038" variableName="requestComponents" />
+			<set-variable value='#[payload.flowComponents.componentName[0] default "Unknown"]' doc:name="apiFlowName" doc:id="c2489304-b099-4174-b087-beaf4e988efc" variableName="apiFlowName" />
+			<ee:transform doc:name="Set httpListenerPath" doc:id="a71581b8-78aa-4c94-a768-612b5ad5f09b">
+				<ee:message>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpListenerPath"><![CDATA[%dw 2.0
+import * from dw::core::Strings
+import * from modules::globalFun
+output application/json
+---
+replaceAll(replaceAll(trimString(payload..flowName[0]),"(","{"),")","}")]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<ee:transform doc:name="Find implFlow equals apiFlowName" doc:id="22d9e0d0-f08d-4c2b-a491-38c817c670aa">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+(vars.implFlows filter((value) -> (value.key == vars.apiFlowName and not contains(value..httpRequestPath[0],/\#/))))[0]]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="while-loopSubFlow" doc:id="ad95c74b-3c5c-42f1-ac3a-1aa797e1c77f" name="while-loopSubFlow" />
+			<ee:transform doc:name="Put apiFlowResult to totalFlows var" doc:id="f72a02d8-19b0-4edc-9d72-6235466eba8d">
+				<ee:message>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="totalFlows"><![CDATA[%dw 2.0
+output application/json
+var flow = {
+	'$(vars.apiFlowName)': {
+		apiName: vars.apiName,
+		httpListenerPath: vars.httpListenerPath default "",
+		components: vars.requestComponents
+	}
+}
+---
+vars.totalFlows << flow]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</foreach>
+		<ee:transform doc:name="Transform Message" doc:id="8ed5222f-8052-446f-9e9b-91a6da34662f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.totalFlows]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<remove-variable doc:name="totalFlows" doc:id="f23ea2d1-3071-4ba6-920a-6196aec8e33b" variableName="totalFlows" />
+		<remove-variable doc:name="requestComponents" doc:id="43902775-5900-4f9d-9ef4-9ffbdd986146" variableName="requestComponents"/>
+		<remove-variable doc:name="httpListenerPath" doc:id="529417b0-804d-484d-9e62-ada210623ce5" variableName="httpListenerPath"/>
+		<remove-variable doc:name="apiFlowName" doc:id="6f3cad26-7b22-43cc-afbe-9f6aef69250f" variableName="apiFlowName"/>
+		<choice doc:name="Choice" doc:id="43f9ee98-0786-4094-93dd-feebbd0acd5b">
+				<when expression="#[matches(vars.apiName, /^.*experience-api/)]">
+					<ee:transform doc:name="Save experience api flows" doc:id="5d7587fb-73cd-446c-a0dd-9f82d2a494d2">
+						<ee:message />
+						<ee:variables>
+							<ee:set-variable variableName="experienceApis"><![CDATA[%dw 2.0
+output application/json
+---
+vars.experienceApis ++ (payload filter not isEmpty($..componentAttributes[0]))]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+				</when>
+				<when expression="#[matches(vars.apiName, /^.*process-api/)]">
+					<ee:transform doc:name="Save process api flows" doc:id="0ee7c36c-7d42-4632-9456-dd5c3a0997e6">
+						<ee:message />
+						<ee:variables>
+							<ee:set-variable variableName="processApis"><![CDATA[%dw 2.0
+output application/json
+---
+vars.processApis ++ (payload filter not isEmpty($..componentAttributes[0]))]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+				</when>
+				<otherwise>
+					<ee:transform doc:name="Save system api flows" doc:id="e4f9b3f7-30d3-4a39-8499-f3ef4f42735b">
+						<ee:message />
+						<ee:variables>
+							<ee:set-variable variableName="systemApis"><![CDATA[%dw 2.0
+output application/json
+---
+vars.systemApis ++ payload]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+				</otherwise>
+			</choice>
+	</sub-flow>
+	<sub-flow name="while-loopSubFlow" doc:id="0b9817e0-901a-4b83-a3b0-43ccc3ac5820" >
+		<set-variable value='#[""]' doc:name="flowRefName" doc:id="3d6f564c-7fee-4a6f-8b0d-95f86d5f2ab5" variableName="flowRefName"/>
+		<foreach doc:name="For Each" doc:id="25e5586d-8bff-472b-be79-b8d893216eb5" collection="#[payload.flowComponents default []]">
+			<ee:transform doc:name="Transform Message" doc:id="9e5731a9-476c-4b64-bf20-5b1d67a9bd5c">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+					<ee:set-variable variableName="flowRefName" ><![CDATA[%dw 2.0
+output application/json
+---
+payload..flowRefName[0]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+			<choice doc:name="Choice" doc:id="3de07867-f1b2-45e7-9256-511f7bfb72ba" >
+				<when expression='#[(not payload == null) and payload.componentName == "request"]'>
+					<ee:transform doc:name="Add requestApi  field" doc:id="4d8f9e1a-5c1b-4833-aaa1-1e988b3deda0">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload mapObject(value,key) -> 
+	if (key ~= "componentAttributes") 
+    	{(key): value ++ {"requestApi":(vars.globalConfigs filter $.httpRequestConfigName == value.httpRequestConfigRef
+    		and $.currentApiName == vars.apiName
+    	)[0].requestApiFullName
+    	}}
+    else
+    	{(key): value}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<ee:transform doc:name="Put request component to requestComponents" doc:id="b0ea5c2e-edd6-44cf-a2cd-3eec8601e4c2" >
+						<ee:message >
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="requestComponents" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.requestComponents << payload]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+				</when>
+				<when expression="#[not isEmpty(vars.flowRefName)]">
+					<ee:transform doc:name="Transform Message" doc:id="d396741e-e980-45c8-815c-3f69942aa06e">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+(vars.implFlows filter((value) -> value.key == vars.flowRefName))[0]]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+					<flow-ref doc:name="while-loopSubFlow" doc:id="3c7cbfc5-5ecc-4f89-9b7b-3dfbd19b3177" name="while-loopSubFlow" />
+				</when>
+			</choice>
+		</foreach>
+	</sub-flow>
+	<sub-flow name="readApiFlowsMainSubFlow" doc:id="1b639521-c277-4557-b93d-00baf734dc0d" >
+		<set-variable value="#[[] as Array]" doc:name="Set globalConfigs" doc:id="bf8d9b1f-b242-4c18-bb10-333158848a6e" variableName="globalConfigs" />
+		<set-variable value="#[payload]" doc:name="Save original payload" doc:id="f88cf724-77b4-4e59-9466-00aba3b12882" variableName="originalPayload" />
+		<set-variable value="#[[] as Array]" doc:name="Set pathCount" doc:id="272cf404-b682-4e85-b136-de427c284330" variableName="pathCount"/>
+		<set-variable value="#[[] as Array]" doc:name="Set experienceApis" doc:id="eb0d8deb-437f-44f4-9d90-ceb06e790c08" variableName="experienceApis"/>
+		<set-variable value="#[[] as Array]" doc:name="Set processApis" doc:id="7dc5f4f8-a470-400c-9553-c2d493dc5799" variableName="processApis"/>
+		<set-variable value="#[[] as Array]" doc:name="Set systemApis" doc:id="2fcfa794-a76c-4cd3-bfb9-108899d1f441" variableName="systemApis" />
+		<set-variable value="#[[] as Array]" doc:name="excludedImplFlows" doc:id="a6af5daf-646a-4183-914a-8379432ec21d" variableName="excludedImplFlows"/>
+		<set-variable value="#[[] as Array]" doc:name="schedulers" doc:id="2a503fe9-b8c0-4070-85a2-d88c7e2ff68f" variableName="schedulers"/>
+		<foreach doc:name="For Each" doc:id="bc18be41-e6cb-4e11-ad66-fb3a24b876f4" collection="#[payload.apiNames]">
+			<flow-ref doc:name="testFlow" doc:id="cf4f3211-f0aa-47d5-b7ce-c21162323988" name="testFlow" />
+		</foreach>
+		<flow-ref doc:name="fileWriteSubFlow" doc:id="24b91ae5-fea5-4cbd-8233-04625711246f" name="fileWriteSubFlow"/>
+	</sub-flow>
+	<sub-flow name="testFlow" doc:id="f2e5bdf9-09b3-4247-9e7d-15ccf7f464c1">
+		<set-variable value="#[[] as Array]" doc:name="Set implFlows" doc:id="a71a5439-3f16-45ce-afb6-c7b661fbd39d" variableName="implFlows"/>
+		<ee:transform doc:name="Set apiName" doc:id="470f3ead-77bc-4911-a532-3dbb0d65efa4">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="apiName"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Set filePath" doc:id="9c283e26-9e31-4d20-9da1-462c72fa0ce3">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="filePath"><![CDATA[%dw 2.0
+output application/json
+---
+vars.apiName ++ p('folder.mule.path')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<file:list doc:name="List of impl files" doc:id="89fb895a-1d75-4b73-99c3-33aff929e372" config-ref="File_Config" directoryPath="#[vars.filePath]" target="fileList" targetValue="#[payload..fileName]" />
+		<ee:transform doc:name="Get globalFileName from fileList" doc:id="ad500d27-335e-4c09-9466-55994afc586c">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+import firstWith from dw::core::Arrays
+output application/json
+---
+vars.fileList firstWith ((item) -> matches(item,/^.*-global\.xml/))]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Drop globalFileName from fileList" doc:id="41e7011b-10f4-4e64-ad21-6527f48708dd">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="fileList"><![CDATA[%dw 2.0
+output application/json
+---
+vars.fileList - payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="makeFilePathSubFlow" doc:id="f3a98165-72b6-4a91-8c9a-32c6ac4fa475" name="makeFilePathSubFlow" />
+		<java:invoke-static method="readConfigs(java.lang.String)" doc:name="Invoke static method readConfigs()" doc:id="65a06bbe-23c9-4792-a167-d0dd9d563671" class="utils.XMLFlowParser">
+						<java:args><![CDATA[#[{
+	"arg0" : vars.fullFilePath
+}]]]></java:args>
+					</java:invoke-static>
+		<ee:transform doc:name="Save configurations to var" doc:id="b6d80798-cebd-4f47-b686-aa0bdaaa197c">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="globalFile"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+		<foreach doc:name="For Each" doc:id="36f859c5-6a0c-48fd-b4d8-8d4884b8e26b" collection="#[vars.globalFile]">
+			<set-variable value="#[payload.flowComponents[0].componentName]" doc:name="httpConfigName" doc:id="7f9ce270-056f-410b-846c-40207b8236c6" variableName="httpConfigName"/>
+			<ee:transform doc:name="Transform Message" doc:id="c2de6f7b-4554-45ae-8b59-c6190cbdd255">
+				<ee:message>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="globalBasePath"><![CDATA[%dw 2.0
+output application/json
+---
+(payload..httpRequestBasePath[0] replace /(^\$\{)/ with("")) replace /\}/ with("")]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<ee:transform doc:name="Set payload for properties request" doc:id="06f82b18-da43-4882-a54e-4d06f1669b6c">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var arr = []
+var apiNames = arr + vars.apiName
+---
+{
+	"apiNames": apiNames,
+	"configFiles": vars.originalPayload.configFiles,
+    "operation": vars.originalPayload.operation
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			<flow-ref doc:name="folders-readerSubFlow" doc:id="7d49097e-08ee-4515-bb6e-d714119fd054" name="folders-readerSubFlow" target="properties" />
+			<ee:transform doc:name="Prepare global config file structure" doc:id="cc1f07f4-5001-4940-a8bf-e8ce80079fed">
+				<ee:message>
+					<ee:set-payload><![CDATA[import * from dw::core::Strings
+output application/json
+
+var apiNamesConversion = read(p('api.namesConversion'),'application/json')
+var env = vars.originalPayload.configFiles[0] replace /-.*.yaml/ with(" value")
+---
+vars.properties filter((obj) -> obj."api name"== vars.apiName and obj."property full path" == vars.globalBasePath) map {
+	currentApiName: $."api name",
+	propertyFullPath: $."property full path",
+	httpRequestConfigName: vars.httpConfigName,
+	requestApiShortName: if($."$(env)" startsWith("/")) substringBefore(substringAfter($."$(env)","/"),"/") else substringBefore($."$(env)","/"),
+	requestApiFullName: if($."$(env)" startsWith("/")) apiNamesConversion.'$(substringBefore(substringAfter($."$(env)","/"),"/"))' else apiNamesConversion.'$(substringBefore($."$(env)","/"))'
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<ee:transform doc:name="Put globalConfigs to var" doc:id="2483bea3-fb4b-4988-ae11-a9e1c006fdfc">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="globalConfigs"><![CDATA[%dw 2.0
+output application/json
+---
+vars.globalConfigs ++ payload]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+		</foreach>
+		<foreach doc:name="For Each" doc:id="baa49524-affa-480f-806f-8e9cde345b45" collection="#[vars.fileList default []]">
+			<flow-ref doc:name="makeFilePathSubFlow" doc:id="3c49712a-3d1f-443c-ba09-cc0e259f6ab6" name="makeFilePathSubFlow" />
+			<choice doc:name="Choice" doc:id="7bdfd009-35cf-4bd5-8b62-a242adb21034">
+			<when expression="#[matches(vars.fileName, /^.*-api\.xml/)]" >
+					<java:invoke-static method="readFlows(java.lang.String,java.lang.String[])" doc:name="Invoke static method readFlows()" doc:id="a1622327-16a6-4c7f-8498-771090f481d2" class="utils.XMLFlowParser">
+			<java:args><![CDATA[#[{
+	"arg0" : vars.fullFilePath,
+	"arg1" : ["^.*api-main.*", "^.*api-console.*"]
+}]]]></java:args>
+		</java:invoke-static>
+					<ee:transform doc:name="Save apiFile payload" doc:id="c4fbb9e1-3133-4c89-96f5-d0720034d12d" >
+						<ee:message />
+						<ee:variables >
+							<ee:set-variable variableName="apiFile" ><![CDATA[%dw 2.0
+import * from dw::core::Arrays
+output application/json
+var parts = payload partition (item) -> not isEmpty(item.flowComponents filter ($.componentName contains("scheduler")))
+---
+{
+	schedulers: parts.success,
+	flows: parts.failure
+}
+]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<ee:transform doc:name="Prepare countApiFlow payload" doc:id="afc62848-d0a3-48a6-b949-dc9219323736" >
+						<ee:message >
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="pathCount" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.pathCount << {
+	apiName: vars.apiName,
+	pathFlowCount: sizeOf(vars.apiFile.flows) default 0,
+	pathSchedulerCount: sizeOf(vars.apiFile.schedulers) default 0,
+	schedulers: vars.apiFile.schedulers default []
+}]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+				</when>
+				<otherwise >
+					<java:invoke-static method="readFlows(java.lang.String,java.lang.String[])" doc:name="Invoke static method readFlows()" doc:id="0d83f55e-727f-4129-a1fb-d4693808d487" class="utils.XMLFlowParser" >
+						<java:args ><![CDATA[#[{
+	"arg0" : vars.fullFilePath,
+	"arg1" : ["^.*api-main.*", "^.*api-console.*"]
+}]]]></java:args>
+					</java:invoke-static>
+					<ee:transform doc:name="Map to flow structure" doc:id="222cdf26-69c8-4ff9-8e82-47d3091fcbf6" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload  map(obj) -> {
+	key: obj.flowName,
+	//flowComponents: obj.flowComponents,
+	fileName: vars.fileName,
+	flowComponents: obj.flowComponents default []
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<ee:transform doc:name="Put implFlows to var" doc:id="c045e1cd-787b-4092-8342-b77753826f71">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="implFlows"><![CDATA[%dw 2.0
+import * from dw::util::Values
+import * from dw::core::Strings
+
+output application/json
+
+fun trimSlash(s: String) = if (s startsWith("/")) substringAfter(s,"/") else s
+---
+vars.implFlows ++ (payload map {
+	f: $ mapObject(value,key) -> 
+	if (key ~= "flowComponents") 
+    {(key): value map {
+    		c: $ mapObject(v,k) -> 
+    			if (k ~= "componentAttributes") 
+    			{(k): 
+    				if (contains(v..httpRequestPath[0],/\$\{/)) 
+    					v update "httpRequestPath"  with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', trimSlash(substringAfter(v..httpRequestPath[0],"/") default ""))
+    				else 
+    					v update "httpRequestPath" with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', trimSlash(v..httpRequestPath[0] default ""))
+    				} 
+  				else 
+    				{(k): v}				
+    			}.c	
+    }
+  else 
+    {(key): value}
+}.f)]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<choice doc:name="Choice" doc:id="c7990b53-c233-4d02-b831-28799a36382d">
+						<when expression='#[(not payload..httpRequestConfigRef[0] == null) and (not vars.globalConfigs..httpRequestConfigName[0] == payload..httpRequestConfigRef[0])]'>
+							<flow-ref doc:name="getConfigurationSubFlow" doc:id="ba655a4b-3197-43e2-be78-a87bd5f9f0d0" name="getConfigurationSubFlow" />
+							<ee:transform doc:name="Put globalConfigs to var" doc:id="e7409a30-0d0b-4994-95b9-a90cf0849b7a">
+								<ee:message />
+								<ee:variables>
+									<ee:set-variable variableName="globalConfigs"><![CDATA[%dw 2.0
+output application/json
+---
+vars.globalConfigs ++ payload]]></ee:set-variable>
+								</ee:variables>
+							</ee:transform>
+						</when>
+					</choice>
+				</otherwise>
+		</choice>
+		</foreach>
+		<ee:transform doc:name="Find corrupted flows" doc:id="f6a22274-94eb-42d5-b6be-5d4a9a55b5b6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Arrays
+output application/json
+---
+vars.implFlows partition (item) -> not contains(item..httpRequestPath[0],/\#/)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Save corrupted flows to excludedImplFlowsarray" doc:id="28ba14b5-73dd-42d5-b3f7-e748773b1a1d">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="implFlows"><![CDATA[%dw 2.0
+output application/json
+---
+payload.success]]></ee:set-variable>
+				<ee:set-variable variableName="excludedImplFlows"><![CDATA[%dw 2.0
+output application/json
+---
+vars.excludedImplFlows ++ payload.failure]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="d9ded643-427e-482b-b589-46baf6372a6f" >
+			<when expression="#[not isEmpty(vars.excludedImplFlows)]">
+				<flow-ref doc:name="readExcludedFlowsSubFlow" doc:id="e25ac310-d07f-4e0f-8caa-47a585d563aa" name="readExcludedFlowsSubFlow"/>
+			</when>
+		</choice>
+		<ee:transform doc:name="set implFlows to payload" doc:id="2a49fce8-60f1-4935-a040-bc2799651c47">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.implFlows]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="readImplFileSubFlow" doc:id="25512e1f-2855-46fb-8f3d-5e5a98183c26" name="readImplFileSubFlow"/>
+		<ee:transform doc:name="Filter scheduler flows" doc:id="7dfa9731-802b-43ff-8ffd-7044e5feb060">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.pathCount filter $.apiName == vars.apiName and not isEmpty($.schedulers)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="cdef8544-85e9-4c67-a950-fa3525bfa8f8" >
+			<when expression="#[not isEmpty(payload)]">
+				<flow-ref doc:name="readSchedulerSubFlows" doc:id="de0a2037-2c92-4a13-8de3-3d82c53aa5f0" name="readSchedulerSubFlows" />
+			</when>
+		</choice>
+	</sub-flow>
+	<sub-flow name="getConfigurationSubFlow" doc:id="8eb7a925-cd4d-47e9-a751-35edd8d4e74e" >
+		<ee:transform doc:name="Transform Message" doc:id="2b182760-7c49-4371-899b-58b3abe72cdf" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+
+var apiNamesConversion = read(p('api.namesConversion'),'application/json')
+var env = vars.originalPayload.configFiles[0] replace /-.*.yaml/ with(" value")
+var requestPath = (substringBefore(payload..httpRequestPath[0],"/") replace /(^\$\{)/ with("")) replace /\}/ with("")
+---
+vars.properties filter((obj) -> obj."api name"== vars.apiName and obj."property full path" == substringAfter(substringBefore(payload..httpRequestPath[0],"}/"),"{")) map {
+	currentApiName: $."api name",
+	propertyFullPath: $."property full path",
+	httpRequestConfigName: payload..httpRequestConfigRef[0],
+	requestApiShortName: if($."$(env)" startsWith("/")) substringBefore(substringAfter($."$(env)","/"),"/") else substringBefore($."$(env)","/"),
+	requestApiFullName: if($."$(env)" startsWith("/")) apiNamesConversion.'$(substringBefore(substringAfter($."$(env)","/"),"/"))' else apiNamesConversion.'$(substringBefore($."$(env)","/"))'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
 </mule>

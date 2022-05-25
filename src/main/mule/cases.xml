@@ -1,0 +1,1622 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="casesFlow" doc:id="4fae448d-a404-4080-8b8c-012d7adb2dfe" >
+		<ee:transform doc:name="Transform Message" doc:id="909e7585-7661-4735-b9a6-7087115dd0a0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+import * from dw::core::Strings
+output application/json
+var arr = [
+  {
+    "key": "api.version",
+    "value": "v1"
+  },
+  {
+    "key": "autodiscovery.api.id",
+    "value": "706894"
+  },
+  {
+    "key": "http.listener.path",
+    "value": "ukb2b/prod/sap-sfdc-ea/api/{api.version}"
+  },
+  {
+    "key": "http.request.order-process-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.request.order-process-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.request.order-process-api.basePath",
+    "value": "sap-order-pa/api/{api.version}"
+  },
+  {
+    "key": "http.request.order-process-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.request.product-process-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.request.product-process-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.request.product-process-api.basePath",
+    "value": "sap-product-pa/api/{api.version}"
+  },
+  {
+    "key": "http.request.product-process-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.request.account-process-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.request.account-process-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.request.account-process-api.basePath",
+    "value": "sap-account-pa/api/{api.version}"
+  },
+  {
+    "key": "http.request.account-process-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.request.supplier-process-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.request.supplier-process-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.request.supplier-process-api.basePath",
+    "value": "sap-supplier-pa/api/{api.version}"
+  },
+  {
+    "key": "http.request.supplier-process-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.request.price-process-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.request.price-process-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.request.price-process-api.basePath",
+    "value": "sap-price-pa/api/{api.version}"
+  },
+  {
+    "key": "http.request.price-process-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "mule.username",
+    "value": "mule"
+  },
+  {
+    "key": "mule.password",
+    "value": "![/qzTzQr5Qh4=]"
+  }
+]
+
+var shortApiName = (((arr filter $.'key' == "http.listener.path")[0].value splitBy("/")) filter (value) -> value contains ("-"))[0] default ""
+---
+[] + (shortApiName match {
+		case ea if ea contains "-ea" -> {
+			'$(shortApiName)': (arr.value filter (value) -> value contains ("-pa")) map {
+				i: substringBefore($,"/")
+			}.i
+		}
+		case pa if pa contains "-pa" -> {
+			'$(shortApiName)': (arr.value filter (value) -> value contains ("-sa")) map {
+				i: substringBefore($,"/")
+			}.i
+		}
+		else -> null
+})]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Extract api name from basePath" doc:id="d4c3b3da-d811-4af7-b923-49bebecb3c87" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var path = "ukb2b/prod/sap-sfdc-ea/api/{api.version}"
+var shortApiName = ((path splitBy("/")) filter (value) -> value contains ("-"))[0] default ""
+---
+ shortApiName]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="42e442fe-302a-42f2-81dc-2264e0a71038" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+var arr = [
+  {
+    "key": "api.version",
+    "value": "v1"
+  },
+  {
+    "key": "autodiscovery.api.id",
+    "value": "706894"
+  },
+  {
+    "key": "http.listener.path",
+    "value": "ukb2b/prod/sap-sfdc-ea/api/{api.version}"
+  },
+  {
+    "key": "http.request.order-process-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.request.order-process-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.request.order-process-api.basePath",
+    "value": "sap-order-pa/api/{api.version}"
+  },
+  {
+    "key": "http.request.order-process-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.request.product-process-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.request.product-process-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.request.product-process-api.basePath",
+    "value": "sap-product-pa/api/{api.version}"
+  },
+  {
+    "key": "http.request.product-process-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.request.account-process-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.request.account-process-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.request.account-process-api.basePath",
+    "value": "sap-account-pa/api/{api.version}"
+  },
+  {
+    "key": "http.request.account-process-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.request.supplier-process-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.request.supplier-process-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.request.supplier-process-api.basePath",
+    "value": "sap-supplier-pa/api/{api.version}"
+  },
+  {
+    "key": "http.request.supplier-process-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.request.price-process-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.request.price-process-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.request.price-process-api.basePath",
+    "value": "sap-price-pa/api/{api.version}"
+  },
+  {
+    "key": "http.request.price-process-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "mule.username",
+    "value": "mule"
+  },
+  {
+    "key": "mule.password",
+    "value": "![/qzTzQr5Qh4=]"
+  }
+]
+var apiName= "sap-sfdc-ea"
+---
+apiName match {
+		case ea if ea contains "-ea" -> {
+			'$(apiName)': (arr.value filter (value) -> value contains ("-pa")) map {
+				i: substringBefore($,"/")
+			}.i default []
+		}
+		case pa if pa contains "-pa" -> {
+			'$(apiName)': (arr.value filter (value) -> value contains ("-sa")) map {
+				i: substringBefore($,"/")
+			}.i default []
+		}
+		else -> null
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="pa" doc:id="2c45b11c-7f28-463e-9613-423c02943f42" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+var arr = [
+  {
+    "key": "api.version",
+    "value": "v1"
+  },
+  {
+    "key": "autodiscovery.api.id",
+    "value": "706901"
+  },
+  {
+    "key": "forEach.accounts.size",
+    "value": "3000"
+  },
+  {
+    "key": "http.listener.path",
+    "value": "sap-account-pa/api/{api.version}"
+  },
+  {
+    "key": "http.salesforce-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.salesforce-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.salesforce-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.salesforce-api.basePath",
+    "value": "sap-sfdc-sa/api/{api.version}"
+  },
+  {
+    "key": "http.sap-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.sap-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.sap-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.sap-api.client_id",
+    "value": "ccc2b568-921f-41a8-a232-bef70f0d2164"
+  },
+  {
+    "key": "http.sap-api.client_secret",
+    "value": "359a90df-9353-4922-90b4-f74e8288c84a"
+  },
+  {
+    "key": "http.sap-api.basePath.right-to-buy",
+    "value": "/s4-eu-right-to-buy-sa/api/v1"
+  },
+  {
+    "key": "http.sap-api.basePath.complete-generic-rebate",
+    "value": "/s4-eu-stat-against-target-sa/api/v1"
+  },
+  {
+    "key": "http.sap-api.basePath.credit-balance",
+    "value": "/s4-eu-credit-info-sa/api/v1"
+  },
+  {
+    "key": "http.sap-api.basePath.customer-generic-rebate",
+    "value": "/s4-eu-custrebatereport-sa/api/v1"
+  },
+  {
+    "key": "http.sap-api.basePath.invoice-cred-deb",
+    "value": "/s4-eu-invoice-cred-deb-sa/api/v1/"
+  },
+  {
+    "key": "http.sap-api.credit-balance.client_id",
+    "value": "aa4a29a177ca49e7be3ba3f1c418a0c3"
+  },
+  {
+    "key": "http.sap-api.credit-balance.client_secret",
+    "value": "b4F26e3DcBf349Fa9D2CB2c7B98E75c0"
+  },
+  {
+    "key": "http.foe-bidwh-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.foe-bidwh-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.foe-bidwh-api.basePath",
+    "value": "/foe-bidwh-sa/api/{api.version}"
+  },
+  {
+    "key": "http.foe-bidwh-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.foe-sap-invoice-cred-deb.host",
+    "value": "10.117.95.242"
+  },
+  {
+    "key": "http.foe-sap-invoice-cred-deb.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.foe-sap-invoice-cred-deb.client_id",
+    "value": "b7fc2ebd51314603bbb0f381ef0207da"
+  },
+  {
+    "key": "http.foe-sap-invoice-cred-deb.client_secret",
+    "value": "546f86b26E7D45b1A24373A3FC19dD7e"
+  },
+  {
+    "key": "http.foe-sap-invoice-cred-deb.basePath",
+    "value": "/s4-eu-invoice-cred-deb-sa/api/v1/"
+  },
+  {
+    "key": "http.foe-sap-invoice-cred-deb.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.order-process-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.order-process-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.order-process-api.basePath",
+    "value": "sap-order-pa/api/{api.version}"
+  },
+  {
+    "key": "http.order-process-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.tpos-sa.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.tpos-sa.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.tpos-sa.basePath",
+    "value": "/sap-tpos-sa/api/{api.version}"
+  },
+  {
+    "key": "http.tpos-sa.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.invoice-portal-sa.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.invoice-portal-sa.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.invoice-portal-sa.basePath",
+    "value": "/sap-invoice-portal-sa/api/{api.version}"
+  },
+  {
+    "key": "http.invoice-portal-sa.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "http.ingress-api.host",
+    "value": "10.117.112.24"
+  },
+  {
+    "key": "http.ingress-api.port",
+    "value": "8081"
+  },
+  {
+    "key": "http.ingress-api.basePath",
+    "value": "ingres-sa/api/{api.version}"
+  },
+  {
+    "key": "http.ingress-api.timeout",
+    "value": "480000"
+  },
+  {
+    "key": "scheduler.timezone",
+    "value": "Europe/London"
+  },
+  {
+    "key": "scheduler.daily-1-am",
+    "value": "0 0 1 1/1 * ? *"
+  }
+]
+var apiName= "sap-account-pa"
+---
+apiName match {
+		case ea if ea contains "-ea" -> {
+			'$(apiName)': (arr.value filter (value) -> value contains ("-pa")) map {
+				i: substringBefore($,"/")
+			}.i default []
+		}
+		case pa if pa contains "-pa" -> {
+			'$(apiName)': (arr.value filter (value) -> value contains ("-sa")) map {
+				i: substringBefore($,"/")
+			}.i default []
+		}
+		else -> null
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="testXML" doc:id="8100b943-83c2-4189-824d-281e7237644b" >
+		<ee:transform doc:name="read xml" doc:id="4a2926a7-e380-4759-8ea7-8782adfa7e75" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+readUrl('classpath://examples/test-input-xml.xml', 'application/xml', {
+	streaming: true,
+	collectionPath: "root.repeated"
+}).root.repeated.*user]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="read xml with ns output dw" doc:id="44c828f8-f9ed-428f-90b1-e2e24c2fce4f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+
+output application/dw
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="read xml with ns output json" doc:id="b3ee2789-3765-4e89-aba6-feb7321e6b0d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="b2b_hub_account_process_api" doc:id="64bb850d-82e7-4194-81eb-ed6477642208" >
+		<ee:transform doc:name="Filtering only scheduler flows" doc:id="cc78311c-7776-4d67-bc3e-90497ee5eb30" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Arrays
+output application/json
+var fileName = "b2b_hub_account_process_api.xml"
+---
+if(fileName == "b2b_hub_account_process_api.xml") {
+	api: payload partition (item) -> lower(item.flowName) contains("scheduler")
+} else {
+	impl: payload
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Retrieving schedulersflowNames to list" doc:id="2e5dc890-90c4-4fe0-bc6d-ba120f99f208" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var flowsList = payload
+---
+flowsList]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Retriving flowNames list" doc:id="f3262e65-b4fa-4337-8772-c17f3df46770" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+flatten(payload.flows.flowComponents).componentName]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="1573866d-a1ed-4b17-bd51-df4e4ee444e6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+var arr = [{
+    "api name": "b2b-hub-account-process-api",
+    "property full path": "http.salesforce-api.timeout",
+    "qa value": "720000"
+  },
+  {
+    "api name": "b2b-hub-account-process-api",
+    "property full path": "http.salesforce-api.basePath",
+    "qa value": "sfdc-sa/api/{api.version}"
+  },
+  {
+    "api name": "b2b-hub-account-process-api",
+    "property full path": "http.ingres-api.timeout",
+    "qa value": "720000"
+  },
+  {
+    "api name": "b2b-hub-account-process-api",
+    "property full path": "http.ingres-api.basePath",
+    "qa value": "ingres-sa/api/{api.version}"
+  }]
+---
+arr filter((value) -> value )]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="match file name pattern" doc:id="3c5294cf-b966-4739-a2d4-f4404ad4e0c2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var regex = "^.*process-api\.xml"
+var fileName = "b2b-hub-account-process-api.xml"
+---
+matches(fileName, /^.*process-api\.xml/)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Retrieve value from array by key" doc:id="55574579-f3f0-43e1-8969-158d5e360eb4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var arr = ["b2b-hub-account-process-api.xml","b2b-hub-account-process-impl.xml"]
+---
+arr]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="b2b_hub_account_process_global" doc:id="6a4a6d68-42dd-4e10-99c5-0ca14c34f216" >
+		<ee:transform doc:name="Filtering configurations" doc:id="0b776b53-3727-449e-836c-da9829e662f9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload..httpRequestBasePath[0]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Read short api name from properties" doc:id="1bf48543-0afd-4852-9aa1-c39ace1f8e6d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+
+var apiName = "b2b-hub-account-process-api"
+var propertyFullPath = "http.ingres-api.basePath"
+var env = "qa" ++ " value"
+var dictionary = {
+  "ingres-sa": "b2b-hub-ingres-system-api",
+  "account-pa": "b2b-hub-account-process-api"
+}
+---
+payload filter((obj) -> obj."api name"== apiName and obj."property full path" == propertyFullPath) map {
+	currentApiName: $."api name",
+	propertyFullPath: $."property full path",
+	requestApiShortName: substringBefore($."$(env)","/"),
+	requestApiFullName: dictionary."$(substringBefore($."$(env)","/"))"
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="api name conversion" doc:id="2936240d-bd83-4aef-bf04-7770efd0dca2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var apiNames = p('api.namesConversion')
+//{"a":"b","c":"d"} pluck (value,key,index) -> { (index) : { (value):key} }
+///pluck (value,key) -> {'$(key)':value}
+---
+ read(apiNames,'application/json')]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="replace {} in string" doc:id="1440aa89-2ecc-46fb-867e-ed1c5aee8d8a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var path = "{http.ingres-api.basePath}"
+//["123-456-7890" replace /.*-/ with("")
+---
+(path replace /(^\{)/ with("")) replace /\}/ with("")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="6573b0a2-beab-4ff8-8533-94b9cc0a43d0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var config = [
+  {
+    "currentApiName": "b2b-hub-account-process-api",
+    "propertyFullPath": "http.ingres-api.basePath",
+    "requestApiShortName": "ingres-sa",
+    "requestApiFullName": "b2b-hub-ingres-system-api"
+  }
+]
+var n = "ingres-sa"
+---
+config.*requestApiShortName contains(n)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="replace string" doc:id="8c859db6-bbd9-486f-a2a7-90d3778df735">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var s = "qa-properties.yaml"
+---
+s replace /-.*.yaml/ with(" value")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="b2b_hub_account_process_impl" doc:id="b745a467-7fed-47ed-8d7b-0e67c3f98af1" >
+		<ee:transform doc:name="Filtering flows" doc:id="63e805e7-0ea1-41b0-a808-e0f1b78af490" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var fileName = "b2b_hub_account_process_impl.xml"
+---
+payload  map(obj) -> {
+	key: obj.flowName,
+	//flowComponents: obj.flowComponents,
+	fileName: fileName,
+	flowComponents: obj.flowComponents
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="implFile payload finding flowRef" doc:id="bb886748-7068-45c7-9aaa-3c5fa997d262" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import firstWith from dw::core::Arrays
+output application/json
+
+var apiArr = [
+  "Get-Accounts-SubFlow",
+  "Get-Account-SubFlow",
+  "Get-Account-Markers-SubFlow",
+  "Get-Account-Markers-SubFlow"
+]
+var apiFlow = "Get-Accounts-SubFlow"
+---
+(payload filter((value) -> value.key == apiFlow))[0].flowComponents.componentAttributes.flowRefName default []]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="implFile payload finding requests" doc:id="3a0663b4-d49e-48bc-be6d-6406daaa3e32" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import firstWith from dw::core::Arrays
+output application/json
+
+var apiArr = [
+  "Get-Accounts-SubFlow",
+  "Get-Account-SubFlow",
+  "Get-Account-Markers-SubFlow",
+  "Get-Account-Markers-SubFlow"
+]
+var apiFlow = "Call-Ingres-Account-SubFlow"
+---
+(((payload filter((value) -> value.key == apiFlow))[0].flowComponents)) filter ($.componentName == null)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="49c2d5ff-da0f-4d03-b4da-94f56b811e72" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var s = "apiName"
+---
+{
+	'$(s)': "hello"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="mapping flows" doc:id="6d0a99df-d9fc-4e8b-9ced-2a2b632ae888" >
+		<ee:transform doc:name="get an element from array matching regex" doc:id="38d3d6d1-d8f2-4ab0-b35f-379efafc293f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import firstWith from dw::core::Arrays
+output application/json
+var arr = ["b2b-hub-account-process-api.xml","b2b-hub-account-process-global.xml","b2b-hub-account-process-impl.xml"]
+
+---
+arr firstWith ((item) -> matches(item,/^.*process-global\.xml/)) ]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="put value to array" doc:id="c872e8ee-3261-4145-b24a-28654f3cc6a2">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var arr = []
+var s = "name"
+---
+arr + s]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="flatten array" doc:id="073f913e-e006-46aa-8c0d-9a18cde429ed">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	g: flatten(payload.flowComponents)[0].componentName,
+	path: payload..httpRequestBasePath
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="cd6c295f-fd33-4824-910a-4fd7c15d6e8a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var arr = [
+  {
+    "Get-Accounts-SubFlow": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "control-accounts",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": "request"
+      },
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts/count",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": "request"
+      },
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": "request"
+      },
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts",
+          "httpRequestConfigRef": "SalesForce_API_HTTP_Request",
+          "httpRequestMethod": "PUT"
+        },
+        "componentName": "request"
+      }
+    ]
+  }
+]
+var n = "Get-Accounts-SubFlow"
+---
+flatten(arr."$(n)") distinctBy $.componentAttributes.httpRequestConfigRef]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="2cee40d9-9196-422c-8afd-fb2c1ed1a3af" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var req = {
+    "componentAttributes": {
+      "httpRequestPath": "control-accounts",
+      "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+      "httpRequestMethod": "GET"
+    },
+    "componentName": "request"
+  }
+  
+  
+ var arr = [
+  {
+    "currentApiName": "b2b-hub-account-process-api",
+    "propertyFullPath": "http.ingres-api.basePath",
+    "httpRequestConfigName": "IngresAPI_HTTP_Request",
+    "requestApiShortName": "ingres-sa",
+    "requestApiFullName": "b2b-hub-ingres-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-account-process-api",
+    "propertyFullPath": "http.salesforce-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request",
+    "requestApiShortName": "sfdc-sa",
+    "requestApiFullName": "b2b-hub-sfdc-system-api"
+  }
+]
+---
+(arr filter((value) -> value.httpRequestConfigName == req.componentAttributes.httpRequestConfigRef))[0].requestApiFullName]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="prepare endpoint" doc:id="000fda1f-dc7a-4f24-b1ca-098879c36b51" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+var apiFlows = [{
+    "Get-Account-SubFlow": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts/{uniqueAccountNumber}",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": "request"
+      }
+   ]
+ }]
+ //flatten(apiFlows.."Get-Account-SubFlow")
+ //replace(flowName,/((?<=\:)\\)/) with("/")
+ var flowName = "get:\\accounts:b2b-hub-account-process-api-config"
+ var flowName2 = "get:\\accounts\\(uniqueAccountNumber):b2b-hub-account-process-api-config"
+ var flowName3 = "post:\\orders:application\\json:b2b-hub-sfdc-experience-api-config"
+---
+{
+	f: replace(flowName,/((?<=\:)(\w+\-)*\w+)/) with(""),
+	f2: replace(replace(replace(flowName2,/((?<=\:)\\)/) with("/"),/((?<=\w)\\)/) with("/"),/((?<=\:)(\w+\-)*\w+)/) with(""),
+	f3: replace(flowName2,/(\\)/) with("/"),
+	f4: substringBeforeLast(flowName2,":"),
+	f5: replace(substringBeforeLast(flowName,":"),/(\\)/) with("/"),
+	f6: replace(substringBeforeLast(flowName2,":"),/(\\)/) with("/"),
+	f7: replace(substringBeforeLast(flowName3,":"),/(\\)/) with("/")
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="6e9f0674-1b1e-4b83-a8bb-b71dfe83c064" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+ var flowName = "get:\\accounts:b2b-hub-account-process-api-config"
+ var flowName2 = "get:\\accounts\\(uniqueAccountNumber):b2b-hub-account-process-api-config"
+ var flowName3 = "post:\\orders:application\\json:b2b-hub-sfdc-experience-api-config"
+ 
+ fun trimString(s: String) = 
+ 	if(s startsWith("get")) 
+ 		replace(substringBeforeLast(s,":"),/(\\)/) with("/") 
+ 	else 
+ 		substringBeforeLast(replace(substringBeforeLast(s,":"),/(\\)/) with("/"),":")
+ ---
+ trimString(flowName3)
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="put arr to arr" doc:id="16419810-2d2e-477a-bfcb-2be4320e2d43" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var arr1 = []
+var arr2 = [{"name":"Alex"}]
+---
+arr1 ++ arr2]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="put object to array" doc:id="c272fd1f-4ea1-45f6-8923-03ba00921b6a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var arr = []
+var obj = {"name": "Alex"}
+---
+arr << obj]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="put object to object" doc:id="e0529e44-6a2a-4774-94d8-8207ee8644cc" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+var obj = {"names":["Hello","Gretings"]}
+---
+obj ++ {
+	surnames:["test","sdf"]
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="remove object from array" doc:id="e6b37cc2-22ff-4297-88ad-b27f94cb5e54">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var arr = [{"a":"fdf"},{"b":"123"}]
+var obj = {"b":"123"}
+---
+arr - obj]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="casesFlow1" doc:id="a5360a27-7593-419e-b10a-b8d569bd8b1e" >
+		<ee:transform doc:name="Transform Message" doc:id="6559dfc8-642d-40b3-aeb9-03ea7ef7d297" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="combine exp and process" doc:id="a7276f57-592e-423d-8704-34a5e6aea0ad" >
+		<ee:transform doc:name="join() ea_pa" doc:id="d4bd03c9-8db5-4a70-8363-64c15b0fb7e1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+import * from dw::core::Arrays
+output application/json
+var apiName = payload..httpRequestConfigRef[0]
+var globalConfigs = [
+	{
+    "currentApiName": "b2b-hub-order-process-api",
+    "propertyFullPath": "http.sfdc-sa-api.basePath",
+    "httpRequestConfigName": "HTTP_Request_SalesforceSA_Configuration",
+    "requestApiShortName": "sfdc-sa",
+    "requestApiFullName": "b2b-hub-sfdc-system-api"
+  }
+]
+var requestApiFullName = (globalConfigs filter((item) -> item.httpRequestConfigName == payload..httpRequestConfigRef[0]))[0].requestApiFullName
+var path = payload..httpRequestMethod
+//{"a":"b","c":"d"} mapObject (value,key,index) -> { (index) : { (value):key} }
+//join(users, products, (user) -> user.id, (product) -> product.ownerId)
+//join(payload,vars.processApis,(ea) -> ea.httpRequestPath, (pa) -> pa.httpListenerPath)
+//payload[0]..httpRequestPath[0] == vars.processApis[0]..httpListenerPath[0]
+//payload..httpRequestConfigRef[0] == globalConfigs..httpRequestConfigName[0]
+//globalConfigs filter $..httpRequestConfigName[0] == "OrderProcessAPI_HTTP_Request_configuration"
+//appendIfMissing('$((globalConfigs filter $..httpRequestConfigName[0] == payload..httpRequestConfigRef[0])[0].requestApiFullName)_',":")
+//appendIfMissing('$((globalConfigs filter $..httpRequestConfigName[0] == payload..httpRequestConfigRef[0])[0].requestApiFullName)_',payload..httpListenerPath[0])
+---
+join(payload,vars.processApis,
+	(ea) -> appendIfMissing('$((globalConfigs filter $..httpRequestConfigName[0] == payload..httpRequestConfigRef[0])[0].requestApiFullName)_',ea..httpRequestPath[0]), 
+	(pa) -> appendIfMissing('$(pa..apiName[0])_',pa..httpListenerPath[0])
+)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="join() pa_sa" doc:id="13976842-93f8-4cc4-a64e-4dfbb82793fd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+import * from dw::core::Arrays
+output application/json
+
+var globalConfigs = [{
+    "currentApiName": "b2b-hub-order-process-api",
+    "propertyFullPath": "http.sfdc-sa-api.basePath",
+    "httpRequestConfigName": "HTTP_Request_SalesforceSA_Configuration",
+    "requestApiShortName": "sfdc-sa",
+    "requestApiFullName": "b2b-hub-sfdc-system-api"
+  }]
+var requestApiFullName = (globalConfigs filter((item) -> item.httpRequestConfigName == "HTTP_Request_SalesforceSA_Configuration"))[0].requestApiFullName
+var path = payload..httpRequestMethod
+---
+join(vars.processApis,payload,
+	(pa) -> appendIfMissing('$((globalConfigs filter $..httpRequestConfigName[0] == payload..httpRequestConfigRef[0])[0].requestApiFullName)_',pa..httpRequestPath[0]) default "", 
+	(sa) -> appendIfMissing('$(sa..apiName[0])_',sa..httpListenerPath[0]) default ""
+)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Mapping xlsx payload" doc:id="7d62ed73-6839-4c1c-9aab-c15fe64a74a4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map {
+	Exp_API_endpoint: $.l..httpListenerPath[0],
+	Exp_API_name: $.l..apiName[0],
+	Process_API_endpoint: $.r..httpListenerPath[0],
+	Process_API_name: $.r..apiName[0],
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Replace field value of existing object" doc:id="e2a53c5d-d494-48ba-bc23-8e83ebe2924d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::util::Values
+import * from dw::core::Strings
+output application/json
+var arr = [
+  {
+    "key": "postDataInterrogationReportsSubFlow",
+    "fileName": "b2b-hub-sfdc-experience-data-interrogation-reports-impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "{http.requester.supplier-process-api.basePath}/data-report",
+          "httpRequestMethod": "POST"
+        }
+      },
+      {
+          "componentAttributes": {
+            "httpRequestPath": "{http.requester.profile-process-api.basePath}/profiles/customers",
+            "httpRequestMethod": "GET"
+        }
+      },
+      {
+          "componentAttributes": {
+            "httpRequestPath": "custumes",
+            "httpRequestMethod": "GET"
+        }
+      }
+    ]
+  }
+]
+var replacement = arr..httpRequestPath[0]
+var f = appendIfMissing('$(lower(arr..httpRequestMethod[0])):/',"data") 
+---
+arr[0] mapObject(v,k,i) -> 
+	if (k ~= "flowComponents") 
+    {(k): v update ["componentAttributes", field("httpRequestPath")]  with appendIfMissing('$(lower(arr..httpRequestMethod[0])):/',substringAfter(v..httpRequestPath[0],"/"))} 
+  else 
+    {(k): v}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="update existing field in object structure" doc:id="b450ad25-4a9b-489c-8ccf-49694863b9f7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::util::Values
+import * from dw::core::Strings
+output application/json
+var arr = [
+    {
+      "componentAttributes": {
+        "httpRequestPath": "{http.requester.supplier-process-api.basePath}/data-report",
+        "httpRequestMethod": "POST"
+      }
+    },
+    {
+       "componentAttributes": {
+            "httpRequestPath": "{http.requester.profile-process-api.basePath}//profiles/customers",
+            "httpRequestMethod": "GET"
+        }
+     },
+     {
+          "componentAttributes": {
+            "httpRequestPath": "/custumes",
+            "httpRequestMethod": "GET"
+        }
+      },
+      {
+        		"componentAttributes": {
+          		"httpRequestPath": "#[vars.path.url]",
+          		"httpRequestConfigRef": "SupplierProcessAPI_HTTP_Request_configuration",
+          		"httpRequestMethod": "GET"
+        	}
+      	},
+      {
+        "componentAttributes": {
+          "httpRequestPath": "products/{productCode}",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        }
+      }
+  ]
+var replacement = arr..httpRequestPath[0]
+//arr update ["componentAttributes", field("httpRequestPath")]  with substringAfter(replacement,"/")
+//v update "httpRequestPath"  with appendIfMissing('$(lower(v..httpRequestMethod[0])):/',substringAfter(v..httpRequestPath[0],"/")))
+//v update "httpRequestPath" with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', v..httpRequestPath[0])
+fun trimSlash(s: String) = if (s startsWith("/")) substringAfter(s,"/") else s
+---
+arr map {
+	c: $ mapObject(v,k) -> 
+	if (k ~= "componentAttributes") 
+    {(k): 
+    	if (contains(v..httpRequestPath[0],/\{/)) 
+    		v update "httpRequestPath"  with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', trimSlash((substringAfter(v..httpRequestPath[0],"/"))))
+    		
+    	else 
+    		v update "httpRequestPath" with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', trimSlash(v..httpRequestPath[0]))
+    	} 
+  else 
+    {(k): v}
+}.c]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="update existing field in complicated object structure" doc:id="1ae2349f-fdb6-4e9c-ab3e-b4ea0a5becc3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::util::Values
+import * from dw::core::Strings
+output application/json
+var arr = [{
+	"key": "postDataInterrogationReportsSubFlow",
+	"flowComponents": [
+		{
+      		"componentAttributes": {
+        		"httpRequestPath": "{http.requester.supplier-process-api.basePath}/data-report",
+        		"httpRequestMethod": "POST"
+      		}
+    	},
+	    {
+	       "componentAttributes": {
+	            "httpRequestPath": "{http.requester.profile-process-api.basePath}/profiles/customers",
+	            "httpRequestMethod": "GET"
+	        }
+	     },
+	     {
+	          "componentAttributes": {
+	            "httpRequestPath": "custumes",
+	            "httpRequestMethod": "GET"
+	        }
+	      },
+	      {
+        		"componentAttributes": {
+          		"httpRequestPath": "#[vars.path.url]",
+          		"httpRequestConfigRef": "SupplierProcessAPI_HTTP_Request_configuration",
+          		"httpRequestMethod": "GET"
+        	}
+      	}
+	]
+}]
+var replacement = arr..httpRequestPath[0]
+//v update "httpRequestPath"  with appendIfMissing('$(lower(v..httpRequestMethod[0])):/',substringAfter(v..httpRequestPath[0],"/")))
+//v update "httpRequestPath" with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', v..httpRequestPath[0])
+---
+arr map {
+	f: $ mapObject(value,key) -> 
+	if (key ~= "flowComponents") 
+    {(key): value map {
+    		c: $ mapObject(v,k) -> 
+    			if (k ~= "componentAttributes") 
+    			{(k): 
+    				if (contains(v.httpRequestPath[0],/\{/)) 
+    					v update "httpRequestPath"  with appendIfMissing('$(lower(v..httpRequestMethod[0])):/',substringAfter(v..httpRequestPath[0],"/")) 
+    				else 
+    					v update "httpRequestPath" with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', v..httpRequestPath[0])
+    				} 
+  				else 
+    				{(k): v}				
+    			}.c	
+    }
+  else 
+    {(key): value}
+}.f]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="traversing array" doc:id="e236ab0b-90de-49ac-aea2-10b1dd860cb4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var arr = [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "{http.requester.supplier-process-api.basePath}/data-report",
+          "httpRequestMethod": "POST"
+        }
+      },
+      {
+          "componentAttributes": {
+            "httpRequestPath": "{http.requester.profile-process-api.basePath}/profiles/customers",
+            "httpRequestMethod": "GET"
+        }
+      },
+      {
+          "componentAttributes": {
+            "httpRequestPath": "custumes",
+            "httpRequestMethod": "GET"
+        }
+      }
+    ]
+---
+arr map(key,value) -> {
+	c:key
+}.c]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="remove slash function" doc:id="081fce83-8edc-4aeb-8998-4dbc5f84f7af" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+var s = "/orders/status"
+var s1 = "order/clean"
+
+fun removeSlash(s: String) = if (s startsWith("/")) substringAfter(s,"/") else s
+---
+{
+	s: removeSlash(s),
+	s1: s1 startsWith("/"),
+	s2: removeSlash(s1)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Merging two arrays with leftjoin()" doc:id="3da942c6-5107-4061-b0c1-e41646d3ab74" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Arrays
+var users = [{id: "1", name:"Mariano"},{id: "2", name:"Leandro"},{id: "3", name:"Julian"},{id: "5", name:"Julian"}]
+var products = [{ownerId: "1", name:"DataWeave"},{ownerId: "1", name:"BAT"}, {ownerId: "3", name:"DataSense"}, {ownerId: "4", name:"SmartConnectors"}]
+var prices = [{price: "50.00", productId: 1}]
+
+var mergeUserProduct = leftJoin(users, products, (user) -> user.id, (product) -> product.ownerId)
+var mergeProductPrice = join(products,prices, (prod) -> prod.ownerId, (price) -> price.productId)
+var productPrice = [
+  {
+    "productId": "1",
+    "productName": "DataWeave",
+    "priceId": 1,
+    "price": "50.00"
+  },
+  {
+    "productId": "1",
+    "productName": "BAT",
+    "priceId": 1,
+    "price": "50.00"
+  }
+]
+//productPrice filter $.productId == $.r.ownerId
+output application/json
+---
+result: mergeUserProduct map(value) -> {
+	userId: value.l.id,
+	userName: value.l.name,
+	productId: value.r.ownerId,
+	productName: value.r.name,
+	priceId: productPrice filter $.productId == value.r.ownerId
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="if else then" doc:id="7de0236f-5557-4c25-a30b-3f9877acfb7f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::util::Values
+import * from dw::core::Strings
+import * from dw::core::Arrays
+output application/json
+var arr = [
+	{
+		name: "#"
+	},
+	{
+		name: "{"
+	},
+	{
+		name: null
+	}
+]
+var exclusions = []
+---
+arr map {
+	names: $ mapObject(v,k) ->
+		{(k): 
+			if (contains(v,/\@/))
+				arr - v
+			else if (contains(v,/\{/))
+				v ++ "brace"
+			else
+				v default "null"
+		}
+}.names partition (item) -> not contains(item.name,/\#/)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="joining arrays" doc:id="04813c2d-4cba-4bab-8ebc-c2fdbe922075" >
+		<ee:transform doc:name="Transform Message" doc:id="4f005f8b-bffb-432d-b32a-13e018bbc96e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var arr = [
+        {
+          "pa_path": "post:/ordering",
+          "pa_name": "b2b-hub-order-process-api",
+          "sa_path": "post:/placeOrder",
+          "sa_name": "b2b-hub-remtp-system-api"
+        },
+        {
+          "pa_path": "post:/submit",
+          "pa_name": "b2b-hub-order-process-api",
+          "sa_path": "post:/placeOrder",
+          "sa_name": "b2b-hub-remtp-system-api"
+        }
+      ]
+---
+{
+	sa_name: arr..sa_name joinBy (",\\n"),
+	sa_paths: arr..sa_path joinBy (",\\n")
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Join two arrays with join()" doc:id="7406578b-c718-4405-9422-a64354abce80">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+import * from dw::core::Strings
+import * from dw::core::Arrays
+output application/json
+var apiName = payload..httpRequestConfigRef[0]
+var globalConfigs = [{
+	"currentApiName": "b2b-hub-sfdc-experience-api",
+	"propertyFullPath": "http.requester.order-process-api.basePath",
+	"httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+	"requestApiShortName": "order-pa",
+	"requestApiFullName": "b2b-hub-order-process-api"
+}]
+var requestApiFullName = (vars.globalConfigs filter((item) -> item.httpRequestConfigName == payload..httpRequestConfigRef[0]))[0].requestApiFullName
+var path = payload..httpRequestMethod
+---
+vars.globalConfigs]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Merging pa with sa arrays with leftjoin()" doc:id="f41fb442-06fd-4246-a476-b14d5b3c91c4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+import * from dw::core::Arrays
+var users = [{id: "1", name:"Mariano"},{id: "2", name:"Leandro"},{id: "3", name:"Julian"},{id: "5", name:"Julian"}]
+var products = [{ownerId: "1", name:"DataWeave"},{ownerId: "1", name:"BAT"}, {ownerId: "3", name:"DataSense"}, {ownerId: "4", name:"SmartConnectors"}]
+var prices = [{price: "50.00", productId: 1}]
+
+var mergeUserProduct = leftJoin(users, products, (user) -> user.id, (product) -> product.ownerId)
+var mergeProductPrice = join(products,prices, (prod) -> prod.ownerId, (price) -> price.productId)
+var productPrice = [
+  {
+    "productId": "1",
+    "productName": "DataWeave",
+    "priceId": 1,
+    "price": "50.00"
+  },
+  {
+    "productId": "1",
+    "productName": "BAT",
+    "priceId": 1,
+    "price": "50.00"
+  }
+]
+
+//productPrice filter $.productId == $.r.ownerId
+output application/json
+---
+mergeUserProduct map(value) -> {
+	userId: value.l.id,
+	userName: value.l.name,
+	productId: value.r.ownerId,
+	productName: value.r.name,
+	priceId: productPrice filter $.productId == value.r.ownerId
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="substringAfter() substringBefore()" doc:id="411c143c-a0c1-41f0-a46c-54e0c47ec94e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+var s = "\{http.requester.supplier-process-api.basePath}/data-report"
+var s2 = "{http.sap-api.basePath.credit-balance}/creditInfo"
+---
+{
+	sd: substringAfter(substringBefore(s,"}/"),"{"),
+	sd2: substringAfter(substringBefore(s2,"}/"),"{")
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="filtering globalConfig file" doc:id="3e6a623c-ad0a-4bca-9233-a2b4f7b1fbe7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+import * from dw::core::Arrays
+output application/json
+
+var size = sizeOf(vars.globalConfigs)
+var currentapi = "b2b-hub-sfdc-experience-api"
+var key = "OrderProcessAPI_HTTP_Request_configuration_order-pa"
+//vars.globalConfigs filter $..httpRequestConfigName[0] == ea..httpRequestConfigRef[0]
+---
+vars.globalConfigs filter ($.currentApiName == "b2b-hub-sfdc-experience-api" and $..httpRequestConfigName[0] == "OrderProcessAPI_HTTP_Request_configuration")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="processing excludedImpl" doc:id="bc374501-798d-491a-b40a-20ace93c8b72" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::util::Values
+import * from dw::core::Strings
+output application/json
+
+var obj = {
+  "key": "getRightToBuyCustomerAccountsSubFlow",
+  "fileName": "b2b-sap-account-process-right-to-buy-impl.xml",
+  "flowComponents": [
+    {
+      "componentAttributes": {
+        "httpRequestPath": "get:/#[attributes.maskedRequestPath]",
+        "httpRequestConfigRef": "IngresSystemAPI_HTTP_Request_Configuration",
+        "httpRequestMethod": "GET"
+      },
+      "componentName": "request"
+    },
+    {
+      "componentAttributes": {
+        "flowRefName": "rightToBuyCommonSubFlow"
+      },
+      "componentName": "rightToBuyCommonSubFlow"
+    }
+  ]
+}
+var s = '{"getRightToBuyCustomerAccountsSubFlow":"get:/right-to-buy","getRightToBuyCustomerAccountsSubFlow":"get:/right-to-buy/accounts"}'
+var arr = read(s,'application/json')
+  var exclusionRules = [
+  	{
+  		"key": "getRightToBuyCustomerAccountsSubFlow",
+  		"flowName": "get:/right-to-buy",
+  		"httpRequestPath": "get:/right-to-buy"
+  	},
+  	{
+  		"key": "getRightToBuyCustomerAccountsSubFlow",
+  		"flowName": "get:/right-to-buy/accounts",
+  		"httpRequestPath": "get:/right-to-buy/accounts"
+  	}
+  ]
+---
+obj mapObject(value,key) -> 
+	if (key ~= "flowComponents") 
+    {(key): value map {
+			c: $ mapObject(v,k) ->
+				if (k ~= "componentAttributes")
+					{(k): 
+						v update "httpRequestPath"  with appendIfMissing('$(substringBefore(v.httpRequestPath,":")):',"new")
+					}
+				else
+					{(k): v}
+		}.c
+	}
+  else 
+    {(key): value}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Replace flowApi path" doc:id="3a17560d-0724-4eed-b342-a094ac72057b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+var s1 = "post:\\products\\recall:b2b-sap-product-process-api-config"
+var s2 = "post:\\categories:b2b-sap-product-process-api-config"
+var s3 = "get:\\productsCostPrices:b2b-sap-product-process-api-config"
+var s4 = "post:\\inventory:application\\json:b2b-sap-product-process-api-config"
+var s5 = "post:\\stock-report\\(plantId):application\\json:b2b-sap-product-process-api-config"
+var s6 = "get:\\transfer-orders-edi\\(documentId):b2b-sap-order-process-api-config"
+
+fun trimString(s: String) = 
+ 	if(s startsWith("get")) 
+ 		replace(substringBeforeLast(s,":"),/(\\)/) with("/")
+ 	else if (s contains("application"))
+ 		 substringBeforeLast(replace(substringBeforeLast(s,":"),/(\\)/) with("/"),":")
+ 	else 
+ 		replace(substringBeforeLast(s,":"),/(\\)/) with("/")
+ 		
+
+		
+---
+{
+	s1: trimString(s1),
+	s2: trimString(s2),
+	s3: trimString(s3),
+	s4: trimString(s4),
+	s5: trimString(s5),
+	s6: trimString(s6)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Mapping schedulers with sa" doc:id="99648d6a-db66-46dd-a042-900e21a5e4f1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Arrays
+import * from dw::core::Strings
+output application/json
+
+var sched =[
+  {
+    "accountsInvoicePortalMainSubFlow": {
+      "apiName": "b2b-sap-account-process-api",
+      "httpListenerPath": "scheduler_trigger",
+      "components": [
+
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/account-invoice-portal",
+            "httpRequestConfigRef": "Invoice_Portal_HTTP_Request_configuration",
+            "httpRequestMethod": "POST",
+            "requestApi": "b2b-sap-invoice-portal-system-api"
+          },
+          "componentName": "request"
+        },
+                {
+          "componentAttributes": {
+            "httpRequestPath": "get:/account-invoice-portal",
+            "httpRequestConfigRef": "SalesForce_API_HTTP_Request",
+            "httpRequestMethod": "GET",
+            "requestApi": "b2b-sap-sfdc-system-api"
+          },
+          "componentName": "request"
+        },
+      ]
+    }
+  }
+]
+var sa = [
+	{
+    "key": {
+      "apiName": "b2b-sap-invoice-portal-system-api",
+      "httpListenerPath": "post:/account-invoice-portal",
+      "components": [
+        
+      ]
+    }
+  },
+  {
+    "accountsInvoicePortalMainSubFlow": {
+      "apiName": "b2b-sap-sfdc-system-api",
+      "httpListenerPath": "get:/account-invoice-portal",
+      "components": [
+        
+      ]
+    }
+  }
+]
+---
+sched map {
+	apiName: $..apiName[0],
+    httpListenerPath: $..httpListenerPath[0],
+    components: leftJoin(flatten($..components),sa,
+	(sc) -> appendIfMissing('$(sc..requestApi[0])_', sc..httpRequestPath[0]),
+	(sa) -> appendIfMissing('$(sa..apiName[0])_', sa..httpListenerPath[0])
+)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="47d6a588-5710-4403-8667-6a1cdcc8b96a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var obj = {
+          "componentAttributes": {
+            "httpRequestPath": "post:/account-invoice-portal",
+            "httpRequestConfigRef": "Invoice_Portal_HTTP_Request_configuration",
+            "httpRequestMethod": "POST"
+          },
+          "componentName": "request"
+        }
+var globalConfigs = [{
+    "currentApiName": "b2b-sap-account-process-api",
+    "propertyFullPath": "http.invoice-portal-sa.basePath",
+    "httpRequestConfigName": "Invoice_Portal_HTTP_Request_configuration",
+    "requestApiShortName": "sap-invoice-portal-sa",
+    "requestApiFullName": "b2b-sap-invoice-portal-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-account-process-api",
+    "propertyFullPath": "http.salesforce-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request",
+    "requestApiShortName": "sap-sfdc-sa",
+    "requestApiFullName": "b2b-sap-sfdc-system-api"
+  }]
+  // (globalConfigs filter $.httpRequestConfigName[0] == value.httpRequestConfigRef)[0].requestApiFullName 
+---
+obj mapObject(value,key) -> 
+	if (key ~= "componentAttributes") 
+    	{(key): value ++ {"reqApiName":(globalConfigs filter $.httpRequestConfigName == value.httpRequestConfigRef
+    		and $.currentApiName == "b2b-sap-account-process-api"
+    	)[0].requestApiFullName
+    	}}
+    else
+    	{(key): value}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

@@ -1,0 +1,29 @@
+<root>
+    <text>
+        Text
+    </text>
+    <repeated>
+        <user>
+            <name>Mariano</name>
+            <lastName>de Achaval</lastName>
+            <age>36</age>
+        </user>
+        <user>
+            <lastName>Shokida</lastName>
+            <name>Leandro</name>
+            <age>30</age>
+        </user>
+        <user>
+            <age>29</age>
+            <name>Ana</name>
+            <lastName>Felissati</lastName>
+
+        </user>
+        <user>
+            <age>29</age>
+            <lastName>Chibana</lastName>
+            <name>Christian</name>
+        </user>
+
+    </repeated>
+</root>

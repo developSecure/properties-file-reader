@@ -1,0 +1,24 @@
+[
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestBasePath": "${http.ingres-api.basePath}",
+          "httpRequestConfigName": "IngresAPI_HTTP_Request"
+        },
+        "componentName": "IngresAPI_HTTP_Request"
+      }
+    ]
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestBasePath": "${http.salesforce-api.basePath}",
+          "httpRequestConfigName": "SalesForce_API_HTTP_Request"
+        },
+        "componentName": "SalesForce_API_HTTP_Request"
+      }
+    ]
+  }
+]

@@ -1,0 +1,244 @@
+[
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts",
+          "httpRequestConfigRef": "SalesForce_API_HTTP_Request",
+          "httpRequestMethod": "PUT"
+        },
+        "componentName": null
+      }
+    ],
+    "flowName": "Call-Account-SalesForceApi-SubFlow",
+    "flowAttributes": {
+      "subFlowName": "Call-Account-SalesForceApi-SubFlow"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "control-accounts",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": null
+      },
+      {
+        "componentAttributes": {
+          "flowRefName": "Call-Ingres-Account-SubFlow"
+        },
+        "componentName": "Call-Ingres-Account-SubFlow"
+      },
+      {
+        "componentAttributes": {
+          "flowRefName": "while-loop-Account-SubFlow"
+        },
+        "componentName": "while-loop-Account-SubFlow"
+      }
+    ],
+    "flowName": "while-loop-Account-SubFlow",
+    "flowAttributes": {
+      "subFlowName": "while-loop-Account-SubFlow"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Call-Account-SalesForceApi-SubFlow"
+        },
+        "componentName": "Call-Account-SalesForceApi-SubFlow"
+      }
+    ],
+    "flowName": "processIngresAccountsRspSubFlow",
+    "flowAttributes": {
+      "subFlowName": "processIngresAccountsRspSubFlow"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "while-loop-Account-SubFlow"
+        },
+        "componentName": "while-loop-Account-SubFlow"
+      }
+    ],
+    "flowName": "Scheduler-Account-Call-SubFlow",
+    "flowAttributes": {
+      "subFlowName": "Scheduler-Account-Call-SubFlow"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "while-loop-Account-SubFlow"
+        },
+        "componentName": "while-loop-Account-SubFlow"
+      }
+    ],
+    "flowName": "Get-Accounts-SubFlow",
+    "flowAttributes": {
+      "subFlowName": "Get-Accounts-SubFlow"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Call-Ingres-Account-Markers-SubFlow"
+        },
+        "componentName": "Call-Ingres-Account-Markers-SubFlow"
+      }
+    ],
+    "flowName": "Get-Account-Markers-SubFlow",
+    "flowAttributes": {
+      "subFlowName": "Get-Account-Markers-SubFlow"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Call-Ingres-Account-Markers-SubFlow"
+        },
+        "componentName": "Call-Ingres-Account-Markers-SubFlow"
+      }
+    ],
+    "flowName": "Scheduler-Account-Markers-Call-SubFlow",
+    "flowAttributes": {
+      "subFlowName": "Scheduler-Account-Markers-Call-SubFlow"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts/markers/count",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": null
+      },
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts/markers",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": null
+      },
+      {
+        "componentAttributes": {
+          "flowRefName": "processIngresAccountMarkersRspSubFlow"
+        },
+        "componentName": "processIngresAccountMarkersRspSubFlow"
+      }
+    ],
+    "flowName": "Call-Ingres-Account-Markers-SubFlow",
+    "flowAttributes": {
+      "subFlowName": "Call-Ingres-Account-Markers-SubFlow"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Call-Account-Marker-SalesForceApi-SubFlow"
+        },
+        "componentName": "Call-Account-Marker-SalesForceApi-SubFlow"
+      }
+    ],
+    "flowName": "processIngresAccountMarkersRspSubFlow",
+    "flowAttributes": {
+      "subFlowName": "processIngresAccountMarkersRspSubFlow"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts/markers",
+          "httpRequestConfigRef": "SalesForce_API_HTTP_Request",
+          "httpRequestMethod": "PUT"
+        },
+        "componentName": null
+      }
+    ],
+    "flowName": "Call-Account-Marker-SalesForceApi-SubFlow",
+    "flowAttributes": {
+      "subFlowName": "Call-Account-Marker-SalesForceApi-SubFlow"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts/count",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": null
+      },
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": null
+      },
+      {
+        "componentAttributes": {
+          "flowRefName": "processIngresAccountRspSubFlow"
+        },
+        "componentName": "processIngresAccountRspSubFlow"
+      }
+    ],
+    "flowName": "Call-Ingres-Account-SubFlow",
+    "flowAttributes": {
+      "subFlowName": "Call-Ingres-Account-SubFlow"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Call-Account-SalesForceApi-SubFlow"
+        },
+        "componentName": "Call-Account-SalesForceApi-SubFlow"
+      }
+    ],
+    "flowName": "processIngresAccountRspSubFlow",
+    "flowAttributes": {
+      "subFlowName": "processIngresAccountRspSubFlow"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts/{uniqueAccountNumber}",
+          "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": null
+      },
+      {
+        "componentAttributes": {
+          "httpRequestPath": "accounts",
+          "httpRequestConfigRef": "SalesForce_API_HTTP_Request",
+          "httpRequestMethod": "PUT"
+        },
+        "componentName": null
+      }
+    ],
+    "flowName": "Get-Account-SubFlow",
+    "flowAttributes": {
+      "subFlowName": "Get-Account-SubFlow"
+    }
+  }
+]

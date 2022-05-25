@@ -1,0 +1,226 @@
+[
+  {
+    "placeOrderFlow": {
+      "apiName": "b2b-hub-sfdc-experience-api",
+      "httpListenerPath": "post:/orders",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/ordering",
+            "httpRequestConfigRef": "OrderProcessAPI_HTTP_Request_configuration",
+            "httpRequestMethod": "POST"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "postValidateOrderFlow": {
+      "apiName": "b2b-hub-sfdc-experience-api",
+      "httpListenerPath": "post:/orders/validate",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/validate",
+            "httpRequestConfigRef": "OrderProcessAPI_HTTP_Request_configuration",
+            "httpRequestMethod": "POST"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "postImportOrderFlow": {
+      "apiName": "b2b-hub-sfdc-experience-api",
+      "httpListenerPath": "post:/orders/import",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/import",
+            "httpRequestConfigRef": "OrderProcessAPI_HTTP_Request_configuration",
+            "httpRequestMethod": "POST"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "postSubmitOrderFlow": {
+      "apiName": "b2b-hub-sfdc-experience-api",
+      "httpListenerPath": "post:/orders/submit",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/submit",
+            "httpRequestConfigRef": "OrderProcessAPI_HTTP_Request_configuration",
+            "httpRequestMethod": "POST"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "getProfilesFlow": {
+      "apiName": "b2b-hub-sfdc-experience-api",
+      "httpListenerPath": "get:/profiles",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "get:/profiles",
+            "httpRequestConfigRef": "ProfileProcessAPI_HTTP_Request_configuration",
+            "httpRequestMethod": "GET"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "getUsersFlow": {
+      "apiName": "b2b-hub-sfdc-experience-api",
+      "httpListenerPath": "get:/profiles/users",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "get:/profiles/users",
+            "httpRequestConfigRef": "ProfileProcessAPI_HTTP_Request_configuration",
+            "httpRequestMethod": "GET"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "getTokensFlow": {
+      "apiName": "b2b-hub-sfdc-experience-api",
+      "httpListenerPath": "get:/profiles/tokens",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "get:/profiles/tokens",
+            "httpRequestConfigRef": "ProfileProcessAPI_HTTP_Request_configuration",
+            "httpRequestMethod": "GET"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "putUsersFlow": {
+      "apiName": "b2b-hub-sfdc-experience-api",
+      "httpListenerPath": "put:/profiles/users",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "put:/profiles/users",
+            "httpRequestConfigRef": "ProfileProcessAPI_HTTP_Request_configuration",
+            "httpRequestMethod": "PUT"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "getCustomerFlow": {
+      "apiName": "b2b-hub-sfdc-experience-api",
+      "httpListenerPath": "get:/profiles/customers",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "get:/profiles/customers",
+            "httpRequestConfigRef": "ProfileProcessAPI_HTTP_Request_configuration",
+            "httpRequestMethod": "GET"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "postProductsSearchFlow": {
+      "apiName": "b2b-hub-sfdc-experience-api",
+      "httpListenerPath": "post:/products/search",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/products/search",
+            "httpRequestConfigRef": "ProductProcessAPI_HTTP_Request_configuration",
+            "httpRequestMethod": "POST"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "getMappingDownloadSubFlow": {
+      "apiName": "b2b-hub-sfdc-experience-api",
+      "httpListenerPath": "get:/mapping/download",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "get:/mapping/download",
+            "httpRequestConfigRef": "MappingProcessAPI_HTTP_Request_configuration",
+            "httpRequestMethod": "GET"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "getReportListFlow": {
+      "apiName": "b2b-hub-sfdc-experience-api",
+      "httpListenerPath": "get:/suppliers/reports",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "get:/reports",
+            "httpRequestConfigRef": "HTTP_Request_BIReportsPA_configuration",
+            "httpRequestMethod": "GET"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "getReportFilesFlow": {
+      "apiName": "b2b-hub-sfdc-experience-api",
+      "httpListenerPath": "get:/suppliers/reports/files",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "get:/reports/files",
+            "httpRequestConfigRef": "HTTP_Request_BIReportsPA_configuration",
+            "httpRequestMethod": "GET"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "postDataInterrogationReportsSubFlow": {
+      "apiName": "b2b-hub-sfdc-experience-api",
+      "httpListenerPath": "post:/download-report",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/data-report",
+            "httpRequestConfigRef": "SupplierProcessAPI_HTTP_Request_configuration",
+            "httpRequestMethod": "POST"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  }
+]

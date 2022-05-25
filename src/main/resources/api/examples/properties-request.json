@@ -1,0 +1,4 @@
+{
+	"apiNames": ["b2b-foe-bidwh-system-api","b2b-hub-account-process-api"],
+	"configFiles": ["dev-properties.yaml, qa-properties.yaml"]
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="file-reader-test-suite.xml" />
+	<munit:test name="file-reader-test-suite-folders-readerSubFlowTest" doc:id="23e0421e-d8a1-48f4-a158-e756f53db8cc" description="Test" expectedErrorType="ANY">
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="a79b8fee-7921-49eb-a174-616e98eaeba7" />
+			<flow-ref doc:name="Flow-ref to folders-readerSubFlow" doc:id="09cf79c5-1167-41e7-bb8a-ff63ecf8fb5c" name="folders-readerSubFlow"/>
+		</munit:execution>
+	</munit:test>
+
+
+</mule>

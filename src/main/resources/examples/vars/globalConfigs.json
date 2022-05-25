@@ -1,0 +1,653 @@
+[
+  {
+    "currentApiName": "b2b-foe-mnetics-system-api",
+    "propertyFullPath": "http.foe-mnetics.basePath",
+    "httpRequestConfigName": "MNETICS_HTTP_Request_configuration",
+    "requestApiShortName": "ASLIVE",
+    "requestApiFullName": null
+  },
+  {
+    "currentApiName": "b2b-foe-remtp-system-api",
+    "propertyFullPath": "http.remtp.basePath",
+    "httpRequestConfigName": "ALL-REMTP-SA_HTTP_Request_config",
+    "requestApiShortName": "all",
+    "requestApiFullName": null
+  },
+  {
+    "currentApiName": "b2b-sap-account-process-api",
+    "propertyFullPath": "http.salesforce-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request",
+    "requestApiShortName": "sap-sfdc-sa",
+    "requestApiFullName": "b2b-sap-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-account-process-api",
+    "propertyFullPath": "http.foe-bidwh-api.basePath",
+    "httpRequestConfigName": "BIDWH_invoice_debit_credit_config",
+    "requestApiShortName": "foe-bidwh-sa",
+    "requestApiFullName": "b2b-foe-bidwh-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-account-process-api",
+    "propertyFullPath": "http.tpos-sa.basePath",
+    "httpRequestConfigName": "TPOS_HTTP_Request_configuration",
+    "requestApiShortName": "sap-tpos-sa",
+    "requestApiFullName": "b2b-sap-tpos-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-account-process-api",
+    "propertyFullPath": "http.invoice-portal-sa.basePath",
+    "httpRequestConfigName": "Invoice_Portal_HTTP_Request_configuration",
+    "requestApiShortName": "sap-invoice-portal-sa",
+    "requestApiFullName": "b2b-sap-invoice-portal-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-account-process-api",
+    "propertyFullPath": "http.ingress-api.basePath",
+    "httpRequestConfigName": "IngresSystemAPI_HTTP_Request_Configuration",
+    "requestApiShortName": "ingres-sa",
+    "requestApiFullName": "b2b-hub-ingres-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-account-process-api",
+    "propertyFullPath": "http.sap-api.basePath.credit-balance",
+    "httpRequestConfigName": "SAP_ERP_HTTP_Request",
+    "requestApiShortName": "s4-eu-credit-info-sa",
+    "requestApiFullName": "sap-api"
+  },
+  {
+    "currentApiName": "b2b-sap-account-process-api",
+    "propertyFullPath": "http.sap-api.basePath.complete-generic-rebate",
+    "httpRequestConfigName": "SAP_ERP_HTTP_Request",
+    "requestApiShortName": "s4-eu-stat-against-target-sa",
+    "requestApiFullName": "sap-api"
+  },
+  {
+    "currentApiName": "b2b-sap-account-process-api",
+    "propertyFullPath": "http.sap-api.basePath.customer-generic-rebate",
+    "httpRequestConfigName": "SAP_ERP_HTTP_Request",
+    "requestApiShortName": "s4-eu-custrebatereport-sa",
+    "requestApiFullName": "api-sa"
+  },
+  {
+    "currentApiName": "b2b-sap-account-process-api",
+    "propertyFullPath": "http.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-asn-process-api",
+    "propertyFullPath": "http.salesforce-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request",
+    "requestApiShortName": "sap-sfdc-sa",
+    "requestApiFullName": "b2b-sap-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-order-process-api",
+    "propertyFullPath": "http.foe-remtp-sa.basePath",
+    "httpRequestConfigName": "FOE_REMTP_SA_HTTP_Request_configuration",
+    "requestApiShortName": "foe-remtp-sa",
+    "requestApiFullName": "b2b-foe-remtp-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-order-process-api",
+    "propertyFullPath": "http.foe-mnetics-sa.basePath",
+    "httpRequestConfigName": "FOE_MNETICS_SA_HTTP_Request_configuration",
+    "requestApiShortName": "foe-mnetics-sa",
+    "requestApiFullName": "b2b-foe-mnetics-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-order-process-api",
+    "propertyFullPath": "http.tpos-sa.basePath",
+    "httpRequestConfigName": "TPOS_HTTP_Request_configuration",
+    "requestApiShortName": "sap-tpos-sa",
+    "requestApiFullName": "b2b-sap-tpos-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-order-process-api",
+    "propertyFullPath": "http.b2b-hub-salesforce-api.basePath",
+    "httpRequestConfigName": "B2B-HUB-SalesForce_API_HTTP_Request",
+    "requestApiShortName": "sfdc-sa",
+    "requestApiFullName": "b2b-hub-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-order-process-api",
+    "propertyFullPath": "http.ingress-api.basePath",
+    "httpRequestConfigName": "IngresSystemAPI_HTTP_Request_Configuration",
+    "requestApiShortName": "ingres-sa",
+    "requestApiFullName": "b2b-hub-ingres-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-order-process-api",
+    "propertyFullPath": "http.salesforce-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request_configuration",
+    "requestApiShortName": "sap-sfdc-sa",
+    "requestApiFullName": "b2b-sap-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-order-process-api",
+    "propertyFullPath": "http.supplier-point-sa.basePath",
+    "httpRequestConfigName": "B2B_SUPPLIER_POINT_SA_HTTP_Request_configuration",
+    "requestApiShortName": "suplier-point-sa",
+    "requestApiFullName": "b2b-supplier-point-db-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-order-process-api",
+    "propertyFullPath": "http.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-order-process-api",
+    "propertyFullPath": "http.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-order-process-api",
+    "propertyFullPath": "http.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-order-process-api",
+    "propertyFullPath": "http.sap-api.basePathShort",
+    "httpRequestConfigName": "SAP_API_HTTP_Request_configuration",
+    "requestApiShortName": "s4-eu-salesorder-sa",
+    "requestApiFullName": "sap-api"
+  },
+  {
+    "currentApiName": "b2b-sap-price-process-api",
+    "propertyFullPath": "http.remtp-api.basePath",
+    "httpRequestConfigName": "RemTP_HTTP_Request_configuration1",
+    "requestApiShortName": "remtp-sa",
+    "requestApiFullName": "b2b-hub-remtp-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-price-process-api",
+    "propertyFullPath": "http.ingres-api.basePath",
+    "httpRequestConfigName": "Ingres_HTTP_Request_configuration1",
+    "requestApiShortName": "ingres-sa",
+    "requestApiFullName": "b2b-hub-ingres-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-price-process-api",
+    "propertyFullPath": "http.complete-generics-api.basePath",
+    "httpRequestConfigName": "CompleteGenerics_HTTP_Request_configuration1",
+    "requestApiShortName": "complete-generics-sa",
+    "requestApiFullName": "b2b-hub-complete-generics-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-price-process-api",
+    "propertyFullPath": "http.salesforce-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request_configuration",
+    "requestApiShortName": "sap-sfdc-sa",
+    "requestApiFullName": "b2b-sap-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-price-process-api",
+    "propertyFullPath": "http.foe-salesforce-api.basePath",
+    "httpRequestConfigName": "FOE_SalesForce_API_HTTP_Request",
+    "requestApiShortName": "foe-sfdc-sa",
+    "requestApiFullName": "b2b-foe-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-price-process-api",
+    "propertyFullPath": "http.sap-erp-api.basePath.vendor-pricing",
+    "httpRequestConfigName": "SAP_HTTP_Request_configuration",
+    "requestApiShortName": "s4-eu-vendor-pricing-sa",
+    "requestApiFullName": "sap-api"
+  },
+  {
+    "currentApiName": "b2b-sap-product-process-api",
+    "propertyFullPath": "http.ingres-api.basePath",
+    "httpRequestConfigName": "Ingres_HTTP_Request_configuration",
+    "requestApiShortName": "ingres-sa",
+    "requestApiFullName": "b2b-hub-ingres-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-product-process-api",
+    "propertyFullPath": "http.salesforce-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request",
+    "requestApiShortName": "sap-sfdc-sa",
+    "requestApiFullName": "b2b-sap-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-product-process-api",
+    "propertyFullPath": "http.foe-salesforce-api.basePath",
+    "httpRequestConfigName": "FOE_SalesForce_API_HTTP_Request",
+    "requestApiShortName": "foe-sfdc-sa",
+    "requestApiFullName": "b2b-foe-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-product-process-api",
+    "propertyFullPath": "http.foe-remtp-sa.basePath",
+    "httpRequestConfigName": "FOE_REMTP_SA_HTTP_Request_configuration",
+    "requestApiShortName": "foe-remtp-sa",
+    "requestApiFullName": "b2b-foe-remtp-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-product-process-api",
+    "propertyFullPath": "http.sap-erp-api.product-recall-list.basePath",
+    "httpRequestConfigName": "SAP_HTTP_Request_configuration",
+    "requestApiShortName": "s4-eu-recall-list-sa",
+    "requestApiFullName": "sap-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.account-process-api.basePath",
+    "httpRequestConfigName": "AccountProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-account-pa",
+    "requestApiFullName": "b2b-sap-account-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.supplier-process-api.basePath",
+    "httpRequestConfigName": "SupplierProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-supplier-pa",
+    "requestApiFullName": "b2b-sap-supplier-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.price-process-api.basePath",
+    "httpRequestConfigName": "PriceProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-price-pa",
+    "requestApiFullName": "b2b-sap-price-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.product-process-api.basePath",
+    "httpRequestConfigName": "ProductProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-product-pa",
+    "requestApiFullName": "b2b-sap-product-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.product-process-api.basePath",
+    "httpRequestConfigName": "ProductProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-product-pa",
+    "requestApiFullName": "b2b-sap-product-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.product-process-api.basePath",
+    "httpRequestConfigName": "ProductProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-product-pa",
+    "requestApiFullName": "b2b-sap-product-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-sfdc-experience-api",
+    "propertyFullPath": "http.request.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-supplier-process-api",
+    "propertyFullPath": "http.ingress-api.basePath",
+    "httpRequestConfigName": "IngresSystemAPI_HTTP_Request_Configuration",
+    "requestApiShortName": "ingres-sa",
+    "requestApiFullName": "b2b-hub-ingres-system-api"
+  },
+  {
+    "currentApiName": "b2b-sap-supplier-process-api",
+    "propertyFullPath": "http.sap-api.basePath.backing-data",
+    "httpRequestConfigName": "SAP_API_HTTP_Request_configuration",
+    "requestApiShortName": "s4-eu-backing-data-sa",
+    "requestApiFullName": "sap-api"
+  },
+  {
+    "currentApiName": "b2b-sap-supplier-process-api",
+    "propertyFullPath": "http.sap-api.basePath.purchase-order",
+    "httpRequestConfigName": "SAP_API_HTTP_Request_configuration",
+    "requestApiShortName": "s4-eu-purchaseorder-sa",
+    "requestApiFullName": "sap-api"
+  },
+  {
+    "currentApiName": "b2b-sap-supplier-process-api",
+    "propertyFullPath": "http.sap-api.basePath.settlement-files",
+    "httpRequestConfigName": "SAP_API_HTTP_Request_configuration",
+    "requestApiShortName": "s4-eu-settlement-files-sa",
+    "requestApiFullName": "sap-api"
+  },
+  {
+    "currentApiName": "b2b-sap-supplier-process-api",
+    "propertyFullPath": "http.sap-api.basePath.stock-level",
+    "httpRequestConfigName": "SAP_API_HTTP_Request_configuration",
+    "requestApiShortName": "s4-eu-supplier-stocklevel-sa",
+    "requestApiFullName": "sap-api"
+  },
+  {
+    "currentApiName": "b2b-sap-vendor-process-api",
+    "propertyFullPath": "http.salesforce-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request_configuration",
+    "requestApiShortName": "sap-sfdc-sa",
+    "requestApiFullName": "b2b-sap-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-order-process-api",
+    "propertyFullPath": "http.remtp-api.basePath",
+    "httpRequestConfigName": "HTTP_Request_configuration1",
+    "requestApiShortName": "remtp-sa",
+    "requestApiFullName": "b2b-hub-remtp-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-order-process-api",
+    "propertyFullPath": "http.sfdc-sa-api.basePath",
+    "httpRequestConfigName": "HTTP_Request_SalesforceSA_Configuration",
+    "requestApiShortName": "sfdc-sa",
+    "requestApiFullName": "b2b-hub-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-remtp-system-api",
+    "propertyFullPath": "http.remtp.basePath",
+    "httpRequestConfigName": "RemTP_HTTP_Request",
+    "requestApiShortName": "all",
+    "requestApiFullName": null
+  },
+  {
+    "currentApiName": "b2b-hub-remtp-system-api",
+    "propertyFullPath": "http.consumer.basePath",
+    "httpRequestConfigName": "RemTP_Consumer_HTTP_Request",
+    "requestApiShortName": "endpoints",
+    "requestApiFullName": null
+  },
+  {
+    "currentApiName": "b2b-hub-remtp-system-api",
+    "propertyFullPath": "van-schedules.remtp.basePath",
+    "httpRequestConfigName": "RemTp_Van_schedules_HTTP_Request",
+    "requestApiShortName": "all",
+    "requestApiFullName": null
+  },
+  {
+    "currentApiName": "b2b-hub-sfdc-experience-api",
+    "propertyFullPath": "http.requester.bi-reports-api.basePath",
+    "httpRequestConfigName": "HTTP_Request_BIReportsPA_configuration",
+    "requestApiShortName": "bi-reports-pa",
+    "requestApiFullName": "b2b-hub-bi-reports-process-api"
+  },
+  {
+    "currentApiName": "b2b-hub-sfdc-experience-api",
+    "propertyFullPath": "http.requester.supplier-process-api.basePath",
+    "httpRequestConfigName": "SupplierProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "supplier-pa",
+    "requestApiFullName": "b2b-hub-supplier-process-api"
+  },
+  {
+    "currentApiName": "b2b-hub-sfdc-experience-api",
+    "propertyFullPath": "http.requester.mapping-process-api.basePath",
+    "httpRequestConfigName": "MappingProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "mapping-pa",
+    "requestApiFullName": "b2b-hub-mapping-process-api"
+  },
+  {
+    "currentApiName": "b2b-hub-sfdc-experience-api",
+    "propertyFullPath": "http.requester.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "order-pa",
+    "requestApiFullName": "b2b-hub-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-hub-sfdc-experience-api",
+    "propertyFullPath": "http.requester.product-process-api.basePath",
+    "httpRequestConfigName": "ProductProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "product-pa",
+    "requestApiFullName": "b2b-hub-product-process-api"
+  },
+  {
+    "currentApiName": "b2b-hub-sfdc-experience-api",
+    "propertyFullPath": "http.requester.profile-process-api.basePath",
+    "httpRequestConfigName": "ProfileProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "profile-pa",
+    "requestApiFullName": "b2b-hub-profile-process-api"
+  },
+  {
+    "currentApiName": "b2b-hub-van-schedule-process-api",
+    "propertyFullPath": "http.requester.remtp-api.basePath",
+    "httpRequestConfigName": "RemTP_API_HTTP_Request",
+    "requestApiShortName": "remtp-sa",
+    "requestApiFullName": "b2b-hub-remtp-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-van-schedule-process-api",
+    "propertyFullPath": "http.requester.salesforce-api.basePath",
+    "httpRequestConfigName": "Salesforce_API_HTTP_Request",
+    "requestApiShortName": "sfdc-sa",
+    "requestApiFullName": "b2b-hub-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-contract-process-api",
+    "propertyFullPath": "http.ingres-api.basePath",
+    "httpRequestConfigName": "IngresAPI_HTTP_Request",
+    "requestApiShortName": "ingres-sa",
+    "requestApiFullName": "b2b-hub-ingres-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-contract-process-api",
+    "propertyFullPath": "http.sfdc-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request",
+    "requestApiShortName": "sfdc-sa",
+    "requestApiFullName": "b2b-hub-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-bi-reports-process-api",
+    "propertyFullPath": "http.bi-reports-api.basePath",
+    "httpRequestConfigName": "HTTP_Request_BIReportsSA_configuration",
+    "requestApiShortName": "bi-reports-sa",
+    "requestApiFullName": "b2b-hub-bi-reports-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-bi-reports-process-api",
+    "propertyFullPath": "http.sfdc-api.basePath",
+    "httpRequestConfigName": "HTTP_Request_SFDCSA_configuration",
+    "requestApiShortName": "sfdc-sa",
+    "requestApiFullName": "b2b-hub-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-bi-reports-system-api",
+    "propertyFullPath": "http.requester.bi-reports-api.basePath",
+    "httpRequestConfigName": "HTTP_Request_BIReports_configuration",
+    "requestApiShortName": "bi_service",
+    "requestApiFullName": null
+  },
+  {
+    "currentApiName": "b2b-hub-supplier-process-api",
+    "propertyFullPath": "http.ingress-api.basePath",
+    "httpRequestConfigName": "IngresSystemAPI_HTTP_Request_Configuration",
+    "requestApiShortName": "ingres-sa",
+    "requestApiFullName": "b2b-hub-ingres-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-supplier-process-api",
+    "propertyFullPath": "http.sfdc-sa-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request",
+    "requestApiShortName": "sfdc-sa",
+    "requestApiFullName": "b2b-hub-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-mapping-process-api",
+    "propertyFullPath": "http.sfdc-sa-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request",
+    "requestApiShortName": "sfdc-sa",
+    "requestApiFullName": "b2b-hub-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-profile-process-api",
+    "propertyFullPath": "http.requester.profile-system-api.basePath",
+    "httpRequestConfigName": "ProfileSystemAPI_HTTP_Request_configuration",
+    "requestApiShortName": "profile-sa",
+    "requestApiFullName": "b2b-hub-profile-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-price-process-api",
+    "propertyFullPath": "http.remtp-api.basePath",
+    "httpRequestConfigName": "RemTP_HTTP_Request_configuration1",
+    "requestApiShortName": "remtp-sa",
+    "requestApiFullName": "b2b-hub-remtp-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-price-process-api",
+    "propertyFullPath": "http.salesforce-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request_configuration",
+    "requestApiShortName": "sfdc-sa",
+    "requestApiFullName": "b2b-hub-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-price-process-api",
+    "propertyFullPath": "http.ingres-api.basePath",
+    "httpRequestConfigName": "Ingres_HTTP_Request_configuration1",
+    "requestApiShortName": "ingres-sa",
+    "requestApiFullName": "b2b-hub-ingres-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-price-process-api",
+    "propertyFullPath": "http.complete-generics-api.basePath",
+    "httpRequestConfigName": "CompleteGenerics_HTTP_Request_configuration1",
+    "requestApiShortName": "complete-generics-sa",
+    "requestApiFullName": "b2b-hub-complete-generics-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-asn-process-api",
+    "propertyFullPath": "http.salesforce-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request",
+    "requestApiShortName": "sfdc-sa",
+    "requestApiFullName": "b2b-hub-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-account-process-api",
+    "propertyFullPath": "http.ingres-api.basePath",
+    "httpRequestConfigName": "IngresAPI_HTTP_Request",
+    "requestApiShortName": "ingres-sa",
+    "requestApiFullName": "b2b-hub-ingres-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-account-process-api",
+    "propertyFullPath": "http.salesforce-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request",
+    "requestApiShortName": "sfdc-sa",
+    "requestApiFullName": "b2b-hub-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-product-process-api",
+    "propertyFullPath": "http.ingres-api.basePath",
+    "httpRequestConfigName": "IngresAPI_HTTP_Request",
+    "requestApiShortName": "ingres-sa",
+    "requestApiFullName": "b2b-hub-ingres-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-product-process-api",
+    "propertyFullPath": "http.remtp-api.basePath",
+    "httpRequestConfigName": "RemTP_API_HTTP_Request",
+    "requestApiShortName": "remtp-sa",
+    "requestApiFullName": "b2b-hub-remtp-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-product-process-api",
+    "propertyFullPath": "http.salesforce-api.basePath",
+    "httpRequestConfigName": "SalesForce_API_HTTP_Request",
+    "requestApiShortName": "sfdc-sa",
+    "requestApiFullName": "b2b-hub-sfdc-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-product-process-api",
+    "propertyFullPath": "http.barcode-api.basePath",
+    "httpRequestConfigName": "Barcode_API_HTTP_Request",
+    "requestApiShortName": "barcode-sa",
+    "requestApiFullName": "b2b-hub-barcode-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-product-process-api",
+    "propertyFullPath": "http.foe-remtp-api.basePath",
+    "httpRequestConfigName": "FOE_RemTP_API_HTTP_Request",
+    "requestApiShortName": "foe-remtp-sa",
+    "requestApiFullName": "b2b-foe-remtp-system-api"
+  },
+  {
+    "currentApiName": "b2b-hub-product-process-api",
+    "propertyFullPath": "http.foe-remtp-api-dbsvc.basePath",
+    "httpRequestConfigName": "FOE_RemTP_DB_Service_API_HTTP_Request",
+    "requestApiShortName": "foe-remtp-sa",
+    "requestApiFullName": "b2b-foe-remtp-system-api"
+  }
+]

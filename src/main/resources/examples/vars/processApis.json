@@ -1,0 +1,122 @@
+[
+  {
+    "validateOrderlFlow": {
+      "apiName": "b2b-hub-order-process-api",
+      "httpListenerPath": "post:/validate",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/omits",
+            "httpRequestConfigRef": "HTTP_Request_configuration1",
+            "httpRequestMethod": "POST"
+          },
+          "componentName": "request"
+        },
+        {
+          "componentAttributes": {
+            "httpRequestPath": "get:/customer",
+            "httpRequestConfigRef": "HTTP_Request_configuration1",
+            "httpRequestMethod": "GET"
+          },
+          "componentName": "request"
+        },
+        {
+          "componentAttributes": {
+            "httpRequestPath": "get:/stock",
+            "httpRequestConfigRef": "HTTP_Request_configuration1",
+            "httpRequestMethod": "GET"
+          },
+          "componentName": "request"
+        },
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/prices",
+            "httpRequestConfigRef": "HTTP_Request_configuration1",
+            "httpRequestMethod": "POST"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "postOrderSubmitlFlow": {
+      "apiName": "b2b-hub-order-process-api",
+      "httpListenerPath": "post:/ordering",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/placeOrder",
+            "httpRequestConfigRef": "HTTP_Request_configuration1",
+            "httpRequestMethod": "POST"
+          },
+          "componentName": "request"
+        },
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/commitOrder",
+            "httpRequestConfigRef": "HTTP_Request_configuration1",
+            "httpRequestMethod": "POST"
+          },
+          "componentName": "request"
+        },
+        {
+          "componentAttributes": {
+            "httpRequestPath": "patch:/orders/status",
+            "httpRequestConfigRef": "HTTP_Request_SalesforceSA_Configuration",
+            "httpRequestMethod": "PATCH"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "postOrderImportFlow": {
+      "apiName": "b2b-hub-order-process-api",
+      "httpListenerPath": "post:/import",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/orders/import",
+            "httpRequestConfigRef": "HTTP_Request_SalesforceSA_Configuration",
+            "httpRequestMethod": "POST"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  },
+  {
+    "postOrderSubmitlFlow": {
+      "apiName": "b2b-hub-order-process-api",
+      "httpListenerPath": "post:/submit",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/placeOrder",
+            "httpRequestConfigRef": "HTTP_Request_configuration1",
+            "httpRequestMethod": "POST"
+          },
+          "componentName": "request"
+        },
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/commitOrder",
+            "httpRequestConfigRef": "HTTP_Request_configuration1",
+            "httpRequestMethod": "POST"
+          },
+          "componentName": "request"
+        },
+        {
+          "componentAttributes": {
+            "httpRequestPath": "patch:/orders/status",
+            "httpRequestConfigRef": "HTTP_Request_SalesforceSA_Configuration",
+            "httpRequestMethod": "PATCH"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  }
+]

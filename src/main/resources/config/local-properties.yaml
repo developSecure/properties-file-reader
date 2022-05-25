@@ -2,10 +2,17 @@ workingDirectory: "C:/Users/oshen/AnypointStudio/studio-workspace/"
 
 folder:
   path: "/src/main/resources/config/"
+  mule:
+    path: "/src/main/mule/"
+    
+api:
+  exclusions: ["^.*api-main.*", "^.*api-console.*", "^.*mckesson-mule-common.*"]
+  namesConversion: '{"foe-bidwh-sa":"b2b-foe-bidwh-system-api","foe-mnetics-sa":"b2b-foe-mnetics-system-api","foe-remtp-sa":"b2b-foe-remtp-system-api","foe-sfdc-sa":"b2b-foe-sfdc-system-api","sap-account-pa":"b2b-sap-account-process-api","sap-asn-pa":"b2b-sap-asn-process-api","sap-invoice-portal-sa":"b2b-sap-invoice-portal-system-api","sap-order-pa":"b2b-sap-order-process-api","sap-price-pa":"b2b-sap-price-process-api","sap-product-pa":"b2b-sap-product-process-api","sap-sfdc-ea":"b2b-sap-sfdc-experience-api","sap-sfdc-sa":"b2b-sap-sfdc-system-api","sap-supplier-pa":"b2b-sap-supplier-process-api","sap-tpos-sa":"b2b-sap-tpos-system-api","sap-vendor-pa":"b2b-sap-vendor-process-api","suplier-point-sa":"b2b-supplier-point-db-system-api","order-pa":"b2b-hub-order-process-api","remtp-sa":"b2b-hub-remtp-system-api","sfdc-ea":"b2b-hub-sfdc-experience-api","sfdc-sa":"b2b-hub-sfdc-system-api","van-schedule-pa":"b2b-hub-van-schedule-process-api","contract-pa":"b2b-hub-contract-process-api","bi-reports-pa":"b2b-hub-bi-reports-process-api","bi-reports-sa":"b2b-hub-bi-reports-system-api","supplier-pa":"b2b-hub-supplier-process-api","mapping-pa":"b2b-hub-mapping-process-api","complete-generics-sa":"b2b-hub-complete-generics-system-api","barcode-sa":"b2b-hub-barcode-system-api","profile-sa":"b2b-hub-profile-system-api","profile-pa":"b2b-hub-profile-process-api","price-pa":"b2b-hub-price-process-api","asn-pa":"b2b-hub-asn-process-api","ingres-sa":"b2b-hub-ingres-system-api","account-pa":"b2b-hub-account-process-api","sfdc-sa":"b2b-hub-sfdc-system-api","product-pa":"b2b-hub-product-process-api","s4-eu-right-to-buy-sa":"sap-api","s4-eu-stat-against-target-sa":"sap-api","s4-eu-credit-info-sa":"sap-api","s4-eu-custrebatereport-sa":"sap-api","s4-eu-invoice-cred-deb-sa":"sap-api","s4-eu-salesorder-sa":"sap-api","s4-eu-vendor-pricing-sa":"sap-api","s4-eu-recall-list-sa":"sap-api","s4-eu-backing-data-sa":"sap-api","s4-eu-purchaseorder-sa":"sap-api","s4-eu-settlement-files-sa":"sap-api","s4-eu-supplier-stocklevel-sa":"sap-api","s4-eu-customer-return-sa":"sap-api","s4-eu-stock-report-sa":"sap-api","s4-eu-movingaverageprice-sa":"sap-api"}'
   
 projects:
-  namelist: ["b2b-foe-bidwh-system-api","b2b-foe-mnetics-system-api","b2b-foe-remtp-system-api","b2b-foe-sfdc-system-api","b2b-sap-account-process-api","b2b-sap-asn-process-api","b2b-sap-invoice-portal-system-api","b2b-sap-order-process-api","b2b-sap-price-process-api","b2b-sap-product-process-api","b2b-sap-sfdc-experience-api","b2b-sap-sfdc-system-api","b2b-sap-supplier-process-api","b2b-sap-tpos-system-api","b2b-sap-vendor-process-api","b2b-supplier-point-db-system-api","b2b-hub-account-process-api","b2b-hub-ingres-system-api","b2b-hub-remtp-system-api","b2b-hub-sfdc-system-api","b2b-hub-van-schedule-process-api"]
-  #namelist: ["b2b-hub-account-process-api","b2b-hub-ingres-system-api","b2b-hub-remtp-system-api","b2b-hub-sfdc-system-api","b2b-hub-van-schedule-process-api"]
+  #namelist: ["b2b-foe-bidwh-system-api","b2b-foe-mnetics-system-api","b2b-foe-remtp-system-api","b2b-foe-sfdc-system-api","b2b-sap-account-process-api","b2b-sap-asn-process-api","b2b-sap-invoice-portal-system-api","b2b-sap-order-process-api","b2b-sap-price-process-api","b2b-sap-product-process-api","b2b-sap-sfdc-experience-api","b2b-sap-sfdc-system-api","b2b-sap-supplier-process-api","b2b-sap-tpos-system-api","b2b-sap-vendor-process-api","b2b-supplier-point-db-system-api","b2b-hub-account-process-api","b2b-hub-ingres-system-api","b2b-hub-order-process-api","b2b-hub-remtp-system-api","b2b-hub-sfdc-experience-api","b2b-hub-sfdc-system-api","b2b-hub-van-schedule-process-api","b2b-hub-contract-process-api"]
+  #namelist: ["b2b-hub-contract-process-api","b2b-hub-bi-reports-process-api","b2b-hub-bi-reports-system-api","b2b-hub-supplier-process-api","b2b-hub-mapping-process-api","b2b-hub-complete-generics-system-api","b2b-hub-barcode-system-api","b2b-hub-profile-system-api","b2b-hub-profile-process-api","b2b-hub-price-process-api","b2b-hub-asn-process-api"]
+  namelist: ["b2b-hub-account-process-api"]
   
 property:
   fileList: ["local-properties.yaml","dev-properties.yaml","qa-properties.yaml","uat-properties.yaml","prod-properties.yaml"]
@@ -68,5 +75,4 @@ descriptions: [
   "remtp.batch.wait - waiting time between processors in milliseconds",
   "remtp.control.retries - number of attempts to connect to remtp server",
   "remtp.control.wait - waiting time between connection retry to remtp server in milliseconds"
-
   ]

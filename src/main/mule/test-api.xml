@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+	<flow name="get:\invoice-debit-credit:b2b-foe-bidwh-system-api-config" doc:id="545ca6dc-e3b2-4b9b-a772-bd86ffdd6e53" >
+		<flow-ref doc:name="GetInvoiceDebitCreditHeadersSubFlow" doc:id="cbd8331d-c879-4cb2-9a15-4d65ac919c61" name="GetInvoiceDebitCreditHeadersSubflow" />
+		<flow-ref doc:name="testSubFlow" doc:id="8be17f62-33c5-4918-b846-a9536d6afd7b" name="testSubFlow"/>
+	
+</flow>
+	<flow name="delete:\back-order-cancellation:application\json:b2b-foe-bidwh-system-api-config" doc:id="1b3f2784-6f7f-4a20-8455-d84671f43f27" >
+		<flow-ref doc:name="backOrderCancellation" doc:id="484e973d-5096-40ac-b353-715cdb00787d" name="backOrderCancellation"/>
+	</flow>
+	
+</mule>

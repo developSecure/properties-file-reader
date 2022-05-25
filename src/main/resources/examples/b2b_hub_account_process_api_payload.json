@@ -1,0 +1,86 @@
+[
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Scheduler-Account-Call-SubFlow"
+        },
+        "componentName": "Scheduler-Account-Call-SubFlow"
+      }
+    ],
+    "flowName": "b2b_pullAccountDataFromiIngres_Scheduler_Flow",
+    "flowAttributes": {
+      "flowName": "b2b_pullAccountDataFromiIngres_Scheduler_Flow"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Scheduler-Account-Markers-Call-SubFlow"
+        },
+        "componentName": "Scheduler-Account-Markers-Call-SubFlow"
+      }
+    ],
+    "flowName": "b2b_pullAccountMarkersDataFromIngres_Scheduler_Flow",
+    "flowAttributes": {
+      "flowName": "b2b_pullAccountMarkersDataFromIngres_Scheduler_Flow"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Get-Accounts-SubFlow"
+        },
+        "componentName": "Get-Accounts-SubFlow"
+      }
+    ],
+    "flowName": "get:\\accounts:b2b-hub-account-process-api-config",
+    "flowAttributes": {
+      "flowName": "get:\\accounts:b2b-hub-account-process-api-config"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Get-Account-SubFlow"
+        },
+        "componentName": "Get-Account-SubFlow"
+      }
+    ],
+    "flowName": "get:\\accounts\\(uniqueAccountNumber):b2b-hub-account-process-api-config",
+    "flowAttributes": {
+      "flowName": "get:\\accounts\\(uniqueAccountNumber):b2b-hub-account-process-api-config"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Get-Account-Markers-SubFlow"
+        },
+        "componentName": "Get-Account-Markers-SubFlow"
+      }
+    ],
+    "flowName": "get:\\accounts\\markers:b2b-hub-account-process-api-config",
+    "flowAttributes": {
+      "flowName": "get:\\accounts\\markers:b2b-hub-account-process-api-config"
+    }
+  },
+  {
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "flowRefName": "Get-Account-Markers-SubFlow"
+        },
+        "componentName": "Get-Account-Markers-SubFlow"
+      }
+    ],
+    "flowName": "get:\\entitlement-rules:b2b-hub-account-process-api-config",
+    "flowAttributes": {
+      "flowName": "get:\\entitlement-rules:b2b-hub-account-process-api-config"
+    }
+  }
+]

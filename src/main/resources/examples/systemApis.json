@@ -1,0 +1,11 @@
+[
+{
+    "postOrderImportFlow": {
+      "apiName": "b2b-hub-sfdc-system-api",
+      "httpListenerPath": "post:/orders/import",
+      "components": [
+        
+      ]
+    }
+  }
+]
