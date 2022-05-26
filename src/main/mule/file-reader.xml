@@ -174,35 +174,16 @@ flatten(vars.totalProperties)]]></ee:set-payload>
 	<sub-flow name="fileWriteSubFlow" doc:id="67356df7-c7c5-4318-8dab-cf500ae570af" >
 		<ee:transform doc:name="leftjoin() ea and pa" doc:id="57aa7e42-8c93-43ea-a932-910a8cf06127" >
 			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-import * from dw::core::Strings
-import * from dw::core::Arrays
-output application/json
----
-leftJoin(vars.experienceApis,vars.processApis,
-	(ea) -> appendIfMissing('$((vars.globalConfigs filter $..httpRequestConfigName[ea] == 
-ea..httpRequestConfigRef[0] and $..currentApiName == ea..apiName)[0].requestApiFullName)_',
-ea..httpRequestPath[0]) default "", 
-	(pa) -> appendIfMissing('$(pa..apiName[0])_',
-		pa..httpListenerPath[0]
-	) default ""
-)]]></ee:set-payload>
-			</ee:message>
-			<ee:variables >
-			</ee:variables>
-		</ee:transform>
-		<ee:transform doc:name="Mapping merge result ea_pa" doc:id="a3ba12c4-58a4-4efa-a64e-7004cdd3dcf6" >
-			<ee:message >
 			</ee:message>
 			<ee:variables >
 				<ee:set-variable variableName="ea_pa" ><![CDATA[%dw 2.0
 output application/json
 ---
-payload map {
-	ea_path: $.l..httpListenerPath[0],
-	ea_name: $.l..apiName[0],
-	pa_path: $.r..httpListenerPath[0],
-	pa_name: $.r..apiName[0]
+vars.experienceApis map {
+	ea_path: $..httpListenerPath[0],
+	ea_name: $..apiName[0],
+	pa_path: flatten($..components)..httpRequestPath[0],
+	pa_name: flatten($..components)..requestApi[0]
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
@@ -210,33 +191,14 @@ payload map {
 			<ee:message >
 			</ee:message>
 			<ee:variables >
-				<ee:set-variable variableName="mergeProcessSystemApis" ><![CDATA[%dw 2.0
-import * from dw::core::Strings
-import * from dw::core::Arrays
-output application/json
----
-leftJoin(vars.processApis,vars.systemApis,
-	(pa) -> appendIfMissing('$((vars.globalConfigs filter $..httpRequestConfigName[0] == 
-pa..httpRequestConfigRef[0] and $..currentApiName == pa..apiName)[0].requestApiFullName)_' default "",
-pa..httpRequestPath[0]), 
-	(sa) -> appendIfMissing('$(sa..apiName[0])_' default "",
-		sa..httpListenerPath[0]
-	)
-)]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
-		<ee:transform doc:name="Mapping merge result pa and sa" doc:id="2f9cb3ff-27a9-46c8-a8da-20395c751d43" >
-			<ee:message >
-			</ee:message>
-			<ee:variables >
 				<ee:set-variable variableName="pa_sa" ><![CDATA[%dw 2.0
 output application/json
 ---
-vars.mergeProcessSystemApis map {
-	pa_path: $.l..httpListenerPath[0],
-	pa_name: $.l..apiName[0],
-	sa_path: $.r..httpListenerPath[0],
-	sa_name: $.r..apiName[0]
+vars.processApis map {
+	pa_path: $..httpListenerPath[0],
+	pa_name: $..apiName[0],
+	sa_path: flatten($..components)..httpRequestPath,
+	sa_name: flatten($..components)..requestApi
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
@@ -245,8 +207,6 @@ vars.mergeProcessSystemApis map {
 			</ee:message>
 			<ee:variables>
 				<ee:set-variable variableName="totalApiFlows"><![CDATA[%dw 2.0
-import * from dw::core::Strings
-import * from dw::core::Arrays
 output application/json
 
 ---
@@ -256,8 +216,8 @@ output application/json
 	Exp_API_name: $.ea_name,
 	Process_API_endpoint: $.pa_path,
 	Process_API_name: $.pa_name,
-	System_API_endpoint: (vars.pa_sa filter((v)-> v.pa_path == $.pa_path and v.pa_name == $.pa_name))..sa_path joinBy (",\n"),
-	System_API_name: (vars.pa_sa filter((v)-> v.pa_path == $.pa_path and v.pa_name == $.pa_name))..sa_name[0]
+	System_API_endpoint: flatten((vars.pa_sa filter((v)-> v.pa_path == $.pa_path and v.pa_name == $.pa_name))..sa_path) joinBy(",\n"),
+	System_API_name: flatten((vars.pa_sa filter((v)-> v.pa_path == $.pa_path and v.pa_name == $.pa_name))..sa_name) joinBy(",\n")
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
@@ -269,13 +229,13 @@ import * from dw::core::Arrays
 output application/json
 ---
 vars.schedulers map {
-	apiName: $..apiName[0],
-    httpListenerPath: $..httpListenerPath[0],
-    components: leftJoin(flatten($..components),vars.systemApis,
-	(sc) -> appendIfMissing('$(sc..requestApi[0])_' default "", sc..httpRequestPath[0]),
-	(sa) -> appendIfMissing('$(sa..apiName[0])_' default "", sa..httpListenerPath[0]))
-}
-]]></ee:set-payload>
+	sch_name: $..schedulerFlowName[0] default "unknown",
+	sch_time: $..schedulerTime[0] default "",
+	pa_path: $..httpListenerPath[0],
+	pa_name: $..apiName[0],
+	sa_path: flatten($..components)..httpRequestPath  joinBy(",\n "),
+	sa_name: flatten($..components)..requestApi joinBy(",\n ")
+}]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<ee:transform doc:name="Prepare xlsx structure for schedulers" doc:id="b063f88e-9054-476b-b377-3af38efe2e4c" >
@@ -285,16 +245,17 @@ vars.schedulers map {
 				<ee:set-variable variableName="totalApiFlows" ><![CDATA[%dw 2.0
 output application/json
 ---
-vars.totalApiFlows ++ {
-	Shedulers_Details: [{
-		Exp_API_endpoint: "test",
-		Exp_API_name: "test",
-		Process_API_endpoint: "test",
-		Process_API_name: "test",
-		System_API_endpoint: "test",
-		System_API_name: "test"
-	}]
-}]]></ee:set-variable>
+vars.totalApiFlows ++ (
+	Shedulers_Details: payload map {
+		'#': $$ + 1,
+		Scheduler: $.sch_name,
+		Scheduler_time: $.sch_time,
+		Process_API_endpoint: $.pa_path,
+		Process_API_name: $.pa_name,
+		System_API_endpoint: $.sa_path,
+		System_API_name: $.sa_name
+	}
+)]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<ee:transform doc:name="Prepare xlsx structure for httPaths per API" doc:id="0c5c1d73-ed01-4f70-8889-06d2bb850886" >
@@ -307,7 +268,7 @@ vars.totalApiFlows ++ (
 		'#': $$ + 1,
 		API_Name: $.apiName,
 		Schedulers: $.pathSchedulerCount,
-		Flow_Endpoints: $.pathFlowCount
+		Number_of_flows: $.pathFlowCount
 })]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
@@ -385,6 +346,7 @@ vars.excludedImplFlows - vars.corruptedFlow]]></ee:set-variable>
 	<sub-flow name="readSchedulerSubFlows" doc:id="a487448f-780f-45c7-a0f0-745f63af9107">
 		<set-variable value="#[[] as Array]" doc:name="totalFlows" doc:id="654dbb88-2a88-4b18-a17c-8e8667b8c3f5" variableName="totalFlows" />
 		<foreach doc:name="For Each" doc:id="09ff3329-285e-434c-b8b5-9ddb6238295f" collection="#[flatten(payload.schedulers)]">
+			<set-variable value='#[payload.flowName default ""]' doc:name="schedulerFlowName" doc:id="7168e764-3504-4515-a18b-94f47334785f" variableName="schedulerFlowName"/>
 			<foreach doc:name="For Each" doc:id="0242a847-127f-4458-97df-9d172ed8f2c5" collection="#[payload.flowComponents]">
 				<set-variable value="#[[] as Array]" doc:name="requestComponents" doc:id="b8f04df0-f4e1-41d7-b9fd-627185243f99" variableName="requestComponents" />
 				<set-variable value='#[payload.componentName default ""]' doc:name="apiFlowName" doc:id="e0dbaaa2-ac0e-4f42-b524-3558d9781a4b" variableName="apiFlowName" />
@@ -419,6 +381,7 @@ output application/json
 var flow = {
 	'$(vars.apiFlowName)': {
 		apiName: vars.apiName,
+		schedulerFlowName: vars.schedulerFlowName,
 		httpListenerPath: vars.httpListenerPath default "",
 		components: vars.requestComponents
 	}
@@ -564,7 +527,7 @@ payload mapObject(value,key) ->
 	if (key ~= "componentAttributes") 
     	{(key): value ++ {"requestApi":(vars.globalConfigs filter $.httpRequestConfigName == value.httpRequestConfigRef
     		and $.currentApiName == vars.apiName
-    	)[0].requestApiFullName
+    	)[0].requestApiFullName default "empty"
     	}}
     else
     	{(key): value}]]></ee:set-payload>
@@ -708,7 +671,7 @@ vars.properties filter((obj) -> obj."api name"== vars.apiName and obj."property 
 	propertyFullPath: $."property full path",
 	httpRequestConfigName: vars.httpConfigName,
 	requestApiShortName: if($."$(env)" startsWith("/")) substringBefore(substringAfter($."$(env)","/"),"/") else substringBefore($."$(env)","/"),
-	requestApiFullName: if($."$(env)" startsWith("/")) apiNamesConversion.'$(substringBefore(substringAfter($."$(env)","/"),"/"))' else apiNamesConversion.'$(substringBefore($."$(env)","/"))'
+	requestApiFullName: if($."$(env)" startsWith("/")) apiNamesConversion.'$(substringBefore(substringAfter($."$(env)","/"),"/"))' else apiNamesConversion.'$(substringBefore($."$(env)","/"))' default ""
 }]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>

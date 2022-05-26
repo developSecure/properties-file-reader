@@ -1526,17 +1526,7 @@ var sched =[
       "apiName": "b2b-sap-account-process-api",
       "httpListenerPath": "scheduler_trigger",
       "components": [
-
-        {
-          "componentAttributes": {
-            "httpRequestPath": "post:/account-invoice-portal",
-            "httpRequestConfigRef": "Invoice_Portal_HTTP_Request_configuration",
-            "httpRequestMethod": "POST",
-            "requestApi": "b2b-sap-invoice-portal-system-api"
-          },
-          "componentName": "request"
-        },
-                {
+       {
           "componentAttributes": {
             "httpRequestPath": "get:/account-invoice-portal",
             "httpRequestConfigRef": "SalesForce_API_HTTP_Request",
@@ -1545,11 +1535,29 @@ var sched =[
           },
           "componentName": "request"
         },
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/account-invoice-portal",
+            "httpRequestConfigRef": "Invoice_Portal_HTTP_Request_configuration",
+            "httpRequestMethod": "POST",
+            "requestApi": "b2b-sap-invoice-portal-system-api"
+          },
+          "componentName": "request"
+        }
       ]
     }
   }
 ]
-var sa = [
+var system_sa = [
+	{
+    "accountsInvoicePortalMainSubFlow": {
+      "apiName": "b2b-sap-sfdc-system-api",
+      "httpListenerPath": "get:/account-invoice-portal",
+      "components": [
+        
+      ]
+    }
+  },
 	{
     "key": {
       "apiName": "b2b-sap-invoice-portal-system-api",
@@ -1558,25 +1566,57 @@ var sa = [
         
       ]
     }
-  },
-  {
-    "accountsInvoicePortalMainSubFlow": {
-      "apiName": "b2b-sap-sfdc-system-api",
-      "httpListenerPath": "get:/account-invoice-portal",
-      "components": [
-        
-      ]
-    }
   }
+  
 ]
 ---
 sched map {
 	apiName: $..apiName[0],
     httpListenerPath: $..httpListenerPath[0],
-    components: leftJoin(flatten($..components),sa,
+    components: leftJoin(flatten($..components),system_sa,
 	(sc) -> appendIfMissing('$(sc..requestApi[0])_', sc..httpRequestPath[0]),
-	(sa) -> appendIfMissing('$(sa..apiName[0])_', sa..httpListenerPath[0])
-)
+	(sa) -> appendIfMissing('$(sa..apiName[0])_', sa..httpListenerPath[0]))
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="merging sch_sa" doc:id="44316cc7-d979-4d2f-b5d3-f4a6b7bbee4f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var payl =[
+  {
+    "accountsInvoicePortalMainSubFlow": {
+      "apiName": "b2b-sap-account-process-api",
+      "httpListenerPath": "scheduler_triggers",
+      "components": [
+        {
+          "componentAttributes": {
+            "httpRequestPath": "get:/account-invoice-portal",
+            "httpRequestConfigRef": "SalesForce_API_HTTP_Request",
+            "httpRequestMethod": "GET",
+            "requestApi": "b2b-sap-sfdc-system-api"
+          },
+          "componentName": "request"
+        },
+        {
+          "componentAttributes": {
+            "httpRequestPath": "post:/account-invoice-portal",
+            "httpRequestConfigRef": "Invoice_Portal_HTTP_Request_configuration",
+            "httpRequestMethod": "POST",
+            "requestApi": "b2b-sap-invoice-portal-system-api"
+          },
+          "componentName": "request"
+        }
+      ]
+    }
+  }
+]
+---
+payl map {
+	pa_path: $..httpListenerPath[0],
+	pa_name: $..apiName[0],
+	sa_path: flatten($..components)..httpRequestPath  joinBy(",\n "),
+	sa_name: flatten($..components)..requestApi joinBy(",\n ")
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
