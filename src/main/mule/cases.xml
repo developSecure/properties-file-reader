@@ -946,15 +946,85 @@ var obj = {"b":"123"}
 arr - obj]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<ee:transform doc:name="remove obj from arr" doc:id="5e3a310a-3af0-455a-8d4f-a336ce05456e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var arr = [{
+    "key": "getRightToBuyCustomerAccountsSubFlow",
+    "fileName": "b2b-sap-sfdc-experience-right-to-buy-impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "get:/right-to-buy",
+          "httpRequestConfigRef": "AccountProcessAPI_HTTP_Request_configuration",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": "request"
+      },
+      {
+        "componentAttributes": {
+          "flowRefName": "rightToBuyCommonSubFlow"
+        },
+        "componentName": "rightToBuyCommonSubFlow"
+      }
+    ]
+  },
+  {
+    "key": "getRightToBuyCustomerAccountsSubFlow",
+    "fileName": "b2b-sap-sfdc-experience-right-to-buy-impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "get:/right-to-buy/accounts",
+          "httpRequestConfigRef": "AccountProcessAPI_HTTP_Request_configuration",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": "request"
+      },
+      {
+        "componentAttributes": {
+          "flowRefName": "rightToBuyCommonSubFlow"
+        },
+        "componentName": "rightToBuyCommonSubFlow"
+      }
+    ]
+  }]
+  var k = {
+  "key": "getRightToBuyCustomerAccountsSubFlow",
+  "fileName": "b2b-sap-sfdc-experience-right-to-buy-impl.xml",
+  "flowComponents": [
+    {
+      "componentAttributes": {
+        "httpRequestPath": "get:/right-to-buy",
+        "httpRequestConfigRef": "AccountProcessAPI_HTTP_Request_configuration",
+        "httpRequestMethod": "GET"
+      },
+      "componentName": "request"
+    },
+    {
+      "componentAttributes": {
+        "flowRefName": "rightToBuyCommonSubFlow"
+      },
+      "componentName": "rightToBuyCommonSubFlow"
+    }
+  ]
+}
+---
+arr - k]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</flow>
-	<flow name="casesFlow1" doc:id="a5360a27-7593-419e-b10a-b8d569bd8b1e" >
+	<flow name="parsingString" doc:id="a5360a27-7593-419e-b10a-b8d569bd8b1e" >
 		<ee:transform doc:name="Transform Message" doc:id="6559dfc8-642d-40b3-aeb9-03ea7ef7d297" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
-output application/java
+import * from dw::core::Strings
+output application/json
+var s = "\${scheduler.daily-1-am}"
+//substringAfter(substringBefore(payload..timeProperty[0],"}"),"\${")
 ---
-{
-}]]></ee:set-payload>
+substringAfter(substringBefore(s,"}"),"\${")]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 	</flow>
@@ -1617,6 +1687,82 @@ payl map {
 	pa_name: $..apiName[0],
 	sa_path: flatten($..components)..httpRequestPath  joinBy(",\n "),
 	sa_name: flatten($..components)..requestApi joinBy(",\n ")
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="partition ea_pa vs pa_sa" doc:id="b80436e9-92e2-4806-8a0b-5ce80736614e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Arrays
+output application/json
+var ea_pa = [
+{
+    "ea_path": "get:/invoice-debit-credit",
+    "ea_name": "b2b-sap-sfdc-experience-api",
+    "pa_path": "get:/invoice-debit-credit",
+    "pa_name": "b2b-sap-account-process-api"
+  }
+]
+var pa_sa = [
+	{
+		"pa_path": "get:/invoice-debit-credit",
+		"pa_name": "b2b-sap-account-process-api",
+		"sa_path": [
+		  "get:/route-by",
+		  "get:/invoiceHeaders",
+		  "get:/invoice-debit-credit"
+		],
+		"sa_name": [
+		  "b2b-sap-order-process-api",
+		  "sap-api",
+		  "b2b-foe-bidwh-system-api"
+		]
+	  },
+	{
+		"pa_path": "get:/account-invoice-portal",
+		"pa_name": "b2b-sap-account-process-api",
+		"sa_path": [
+		  "get:/account-invoice-portal",
+		  "post:/account-invoice-portal"
+		],
+		"sa_name": [
+		  "b2b-sap-sfdc-system-api",
+		  "b2b-sap-invoice-portal-system-api"
+		]
+	  }
+]
+//flatten((vars.pa_sa filter((v)-> v.pa_path == $.pa_path and v.pa_name == $.pa_name))..sa_path) joinBy(",\n")
+---
+leftJoin(pa_sa,ea_pa,
+	(pa) -> pa.pa_path,
+	(ea) -> ea.pa_path
+) filter $.r == null]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="5e5f285f-3d79-4f34-b714-5c9a096fa7f8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var arr = [
+  {
+    "pa_path": "get:/account-invoice-portal",
+    "pa_name": "b2b-sap-account-process-api",
+    "sa_path": [
+      "get:/account-invoice-portal",
+      "post:/account-invoice-portal"
+    ],
+    "sa_name": [
+      "b2b-sap-sfdc-system-api",
+      "b2b-sap-invoice-portal-system-api"
+    ]
+  }
+]
+---
+arr map {
+	Process_API_endpoint: $.pa_path,
+	Process_API_name: $.pa_name,
+	System_API_endpoint: $.sa_path joinBy(",\n"),
+	System_API_name: $.sa_name joinBy(",\n")
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>

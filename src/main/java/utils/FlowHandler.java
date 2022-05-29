@@ -14,6 +14,7 @@ public class FlowHandler extends DefaultHandler {
     private static final String HTTP_REQUEST = "http:request";
     private static final String HTTP_REQUEST_CONFIG = "http:request-config";
     private static final String SCHEDULER = "scheduler";
+    private static final String CRON = "cron";
 
     private Root root;
     private ApiFlow currentFlow;
@@ -72,6 +73,11 @@ public class FlowHandler extends DefaultHandler {
                 currentFlowComponent = new FlowComponent();
                 currentFlowComponent.setComponentAttributes(new HashMap<>());
                 currentFlowComponent.setComponentName(String.valueOf(new StringBuilder(attributes.getValue("doc:name")).append("_scheduler")));
+                break;
+            case CRON:
+                if(currentFlowComponent.getComponentName().contains("_scheduler")) {
+                    currentFlowComponent.getComponentAttributes().put("timeProperty",attributes.getValue("expression"));
+                };
                 break;
         }
     }

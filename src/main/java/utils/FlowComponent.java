@@ -6,6 +6,10 @@ public class FlowComponent {
     private String componentName;
     private Map<String, String> componentAttributes;
     
+    public String getComponentName() {
+        return componentName;
+    }
+    
     public void setComponentName(String componentName) {
         this.componentName = componentName;
     }
