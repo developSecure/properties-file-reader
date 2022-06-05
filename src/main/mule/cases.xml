@@ -1805,4 +1805,20 @@ obj mapObject(value,key) ->
 			</ee:message>
 		</ee:transform>
 	</flow>
+	<flow name="match()" doc:id="c3e11821-15de-4309-98e6-d032f5e35dfe" >
+		<ee:transform doc:name="Transform Message" doc:id="70050acc-8613-4e12-8bbb-651b00808f8e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var index = 0
+var arr = [{"id":"1"},{"id":"2"}]
+---
+index match {
+	case 0  -> arr[0]
+	case 1 -> arr[1]
+	else -> 0
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
 </mule>

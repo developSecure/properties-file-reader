@@ -171,6 +171,39 @@ flatten(vars.totalProperties)]]></ee:set-payload>
 			</otherwise>
 		</choice>
 	</sub-flow>
+	<sub-flow name="prepareAdditionalFlows" doc:id="8554aacc-3b8c-4bb1-9cf0-d321bbc24633" >
+		<ee:transform doc:name="leftJoin()  added flows from process apis" doc:id="4cbb18c1-8430-41a3-b30d-0e4e846c0fe9">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="pa_sa_added_array"><![CDATA[%dw 2.0
+import * from dw::core::Arrays
+import * from dw::core::Strings
+output application/json
+---
+((leftJoin(vars.pa_sa,vars.ea_pa,
+	(pa) -> appendIfMissing('$(pa.pa_path)_', pa.pa_name),
+	(ea) -> appendIfMissing('$(ea.pa_path)_',ea.pa_name)
+) filter $.r == null).l) orderBy $.pa_path
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Prepare xlsx structure for process additional interfaces" doc:id="89187064-7141-4695-a7ca-25b2033b04bb">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var count = sizeOf(vars.ea_pa)
+---
+vars.pa_sa_added_array map {
+	'#': $$ + count + 1,
+	Process_API_endpoint: $.pa_path,
+	Process_API_name: $.pa_name,
+	System_API_endpoint: $.sa_path joinBy(",\n"),
+	System_API_name: $.sa_name joinBy(",\n")
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
 	<sub-flow name="fileWriteSubFlow" doc:id="67356df7-c7c5-4318-8dab-cf500ae570af" >
 		<ee:transform doc:name="mapping ea and pa" doc:id="57aa7e42-8c93-43ea-a932-910a8cf06127" >
 			<ee:message >
@@ -184,7 +217,7 @@ vars.experienceApis map {
 	ea_name: $..apiName[0],
 	pa_path: flatten($..components)..httpRequestPath[0],
 	pa_name: flatten($..components)..requestApi[0]
-} orderBy $.ea_path]]></ee:set-variable>
+}]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<ee:transform doc:name="mapping pa and sa" doc:id="b7151a20-0afc-4ee4-8027-379f175a8eb4" >
@@ -202,48 +235,37 @@ vars.processApis map {
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<ee:transform doc:name="leftJoin()  added flows from process apis" doc:id="4cbb18c1-8430-41a3-b30d-0e4e846c0fe9" >
-			<ee:message >
-			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="pa_sa_added_array" ><![CDATA[%dw 2.0
-import * from dw::core::Arrays
-import * from dw::core::Strings
-output application/json
----
-((leftJoin(vars.pa_sa,vars.ea_pa,
-	(pa) -> appendIfMissing('$(pa.pa_path)_', pa.pa_name),
-	(ea) -> appendIfMissing('$(ea.pa_path)_',ea.pa_name)
-) filter $.r == null).l) orderBy $.pa_path
-]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
-		<ee:transform doc:name="Prepare xlsx structure for flows" doc:id="89187064-7141-4695-a7ca-25b2033b04bb" >
+		<ee:transform doc:name="group ea_pa by apiName" doc:id="725710fa-1ade-4ba6-a5d4-6b211528f996" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
-var count = sizeOf(vars.ea_pa)
 ---
-vars.pa_sa_added_array map {
-	'#': $$ + count + 1,
-	Exp_API_endpoint: "",
-	Exp_API_name: "",
-	Process_API_endpoint: $.pa_path,
-	Process_API_name: $.pa_name,
-	System_API_endpoint: $.sa_path joinBy(",\n"),
-	System_API_name: $.sa_name joinBy(",\n")
-}]]></ee:set-payload>
+vars.ea_pa groupBy $.ea_name]]></ee:set-payload>
 			</ee:message>
+			<ee:variables >
+			</ee:variables>
 		</ee:transform>
+		<set-variable value="#[[] as Array]" doc:name="grouped" doc:id="e2b148c1-e45a-4692-8a2f-4e9bd99c915b" variableName="grouped"/>
+		<foreach doc:name="For Each" doc:id="149d5663-0e51-499a-bd48-d096c43b0234" >
+			<ee:transform doc:name="Transform Message" doc:id="b0267b5e-95ce-401d-8d49-e126e949de4a" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="grouped" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.grouped ++ (payload..[0] orderBy $.ea_path)]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</foreach>
 		<ee:transform doc:name="Prepare xlsx structure for flows" doc:id="ff483a90-f76b-48ac-a752-960708176565">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
 				<ee:set-variable variableName="totalApiFlows"><![CDATA[%dw 2.0
 output application/json
-
 ---
-"API_Details": vars.ea_pa map {
+"API_Details": vars.grouped map {
 	'#': $$ + 1,
 	Exp_API_endpoint: $.ea_path,
 	Exp_API_name: $.ea_name,
@@ -251,7 +273,7 @@ output application/json
 	Process_API_name: $.pa_name,
 	System_API_endpoint: flatten((vars.pa_sa filter((v)-> v.pa_path == $.pa_path and v.pa_name == $.pa_name))..sa_path) joinBy(",\n"),
 	System_API_name: flatten((vars.pa_sa filter((v)-> v.pa_path == $.pa_path and v.pa_name == $.pa_name))..sa_name) joinBy(",\n")
-} ++ payload]]></ee:set-variable>
+}]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<ee:transform doc:name="Join schedulers with systemApis" doc:id="a5ddb3db-3244-46f1-9d03-897f2a6a5f34" >
@@ -290,6 +312,7 @@ vars.totalApiFlows ++ (
 )]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+		<flow-ref doc:name="prepareAdditionalFlows" doc:id="4cc5e621-88c0-4ada-b056-f0c407c5e7f0" name="prepareAdditionalFlows"/>
 		<ee:transform doc:name="Prepare xlsx structure for httPaths per API" doc:id="0c5c1d73-ed01-4f70-8889-06d2bb850886" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -459,6 +482,7 @@ vars.schedulers ++ vars.totalFlows]]></ee:set-variable>
 	</sub-flow>
 	<sub-flow name="readImplFileSubFlow" doc:id="a3bbe2aa-d25f-4623-9fb9-a8f4128e7683" >
 		<set-variable value="#[[] as Array]" doc:name="totalFlows" doc:id="0007657d-1dea-455a-b133-d564328e3627" variableName="totalFlows" />
+		<set-variable value="#[0 as Number]" doc:name="index" doc:id="60c9e137-d348-4527-bfcd-5136e114c5ee" variableName="index"/>
 		<foreach doc:name="Traversing all apiFlows" doc:id="238eb662-f50f-4685-aec3-7168fe43ffdb" collection="#[vars.apiFile.flows default []]">
 			<set-variable value="#[[] as Array]" doc:name="requestComponents" doc:id="ca58d5cd-3b81-4c9e-ba28-e1b862297038" variableName="requestComponents" />
 			<set-variable value='#[payload.flowComponents.componentName[0] default "Unknown"]' doc:name="apiFlowName" doc:id="c2489304-b099-4174-b087-beaf4e988efc" variableName="apiFlowName" />
@@ -479,22 +503,66 @@ replaceAll(replaceAll(trimString(payload..flowName[0]),"(","{"),")","}")]]></ee:
 					<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-(vars.implFlows filter((value) -> (value.key == vars.apiFlowName and not contains(value..httpRequestPath[0],/\#/))))[0]]]></ee:set-payload>
+(vars.implFlows filter((value) -> (value.key == vars.apiFlowName and not contains(value..httpRequestPath[0],/\#/))))]]></ee:set-payload>
 				</ee:message>
 				<ee:variables>
 				</ee:variables>
 			</ee:transform>
-			<ee:transform doc:name="implFlows - found flow" doc:id="19482b0c-3735-47b8-a277-c7a874ff5784" >
-				<ee:message >
-				</ee:message>
-				<ee:variables >
-					<ee:set-variable variableName="implFlows" ><![CDATA[%dw 2.0
+			<choice doc:name="Choice" doc:id="ae316376-9171-47cf-bad7-e5d1bc09dc29" >
+				<when expression="#[(not payload == null) and sizeOf(payload) &gt; 1]">
+					<ee:transform doc:name="save current payload" doc:id="b479fb6c-ab46-4f77-93fc-8f48ad0fb353">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="currentPayload"><![CDATA[%dw 2.0
 output application/json
 ---
-vars.implFlows - payload]]></ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-			<flow-ref doc:name="while-loopSubFlow" doc:id="ad95c74b-3c5c-42f1-ac3a-1aa797e1c77f" name="while-loopSubFlow" />
+payload]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<ee:transform doc:name="choose right subFlow" doc:id="4c004222-0ef0-4a31-88b2-3486829c62b5">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.index match {
+	case 0  -> payload[0]
+	case 1 -> payload[1]
+	case 2 -> payload[2]
+	case 3 -> payload[3]
+	case 4 -> payload[4]
+	else -> 0
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<ee:transform doc:name="change index" doc:id="58b358d4-06e9-4fc3-8fe0-5502fa2f01a3">
+						<ee:message>
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="index" ><![CDATA[%dw 2.0
+output application/json
+---
+if (sizeOf(vars.currentPayload) - 1 == vars.index) {
+	i: 0
+}.i else {
+	i: vars.index + 1
+}.i]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="while-loopSubFlow" doc:id="ad95c74b-3c5c-42f1-ac3a-1aa797e1c77f" name="while-loopSubFlow" />
+				</when>
+				<otherwise >
+					<ee:transform doc:name="get subFlow from array" doc:id="feeb3cbc-6039-4b66-b7c8-4a1085151759">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload[0]]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<flow-ref doc:name="while-loopSubFlow" doc:id="06a64b16-719d-48da-8a37-1026439aca54" name="while-loopSubFlow" />
+				</otherwise>
+			</choice>
 			<ee:transform doc:name="Put apiFlowResult to totalFlows var" doc:id="f72a02d8-19b0-4edc-9d72-6235466eba8d">
 				<ee:message>
 				</ee:message>
