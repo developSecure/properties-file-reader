@@ -190,18 +190,20 @@ output application/json
 		</ee:transform>
 		<ee:transform doc:name="Prepare xlsx structure for process additional interfaces" doc:id="89187064-7141-4695-a7ca-25b2033b04bb">
 			<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="totalApiFlows" ><![CDATA[%dw 2.0
 output application/json
-var count = sizeOf(vars.ea_pa)
 ---
-vars.pa_sa_added_array map {
-	'#': $$ + count + 1,
+vars.totalApiFlows ++ (
+	Process_Details: vars.pa_sa_added_array map {
+	'#': $$ + 1,
 	Process_API_endpoint: $.pa_path,
 	Process_API_name: $.pa_name,
 	System_API_endpoint: $.sa_path joinBy(",\n"),
 	System_API_name: $.sa_name joinBy(",\n")
-}]]></ee:set-payload>
-			</ee:message>
+})]]></ee:set-variable>
+			</ee:variables>
 		</ee:transform>
 	</sub-flow>
 	<sub-flow name="fileWriteSubFlow" doc:id="67356df7-c7c5-4318-8dab-cf500ae570af" >
@@ -883,7 +885,12 @@ import * from dw::core::Strings
 
 output application/json
 
-fun trimSlash(s: String) = if (s startsWith("/")) substringAfter(s,"/") else s
+fun trimSlash(s: String) = 
+	if (s startsWith("//")) 
+		substring(s,2,sizeOf(s))
+	else if (s startsWith("/"))
+		substringAfter(s,"/")
+	else s
 ---
 vars.implFlows ++ (payload map {
 	f: $ mapObject(value,key) -> 
@@ -892,8 +899,8 @@ vars.implFlows ++ (payload map {
     		c: $ mapObject(v,k) -> 
     			if (k ~= "componentAttributes") 
     			{(k): 
-    				if (contains(v..httpRequestPath[0],/\$\{/)) 
-    					v update "httpRequestPath"  with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', trimSlash(substringAfter(v..httpRequestPath[0],"/") default ""))
+    				if (matches(v..httpRequestPath[0],/(^\$\{\w*.*\})(\/{0,2}\w+)*(\w*(\-\w*)*(\/)*)*/)) 
+    					v update "httpRequestPath"  with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', trimSlash(substringAfter(v..httpRequestPath[0],"}") default ""))
     				else 
     					v update "httpRequestPath" with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', trimSlash(v..httpRequestPath[0] default ""))
     				} 
@@ -907,7 +914,7 @@ vars.implFlows ++ (payload map {
 						</ee:variables>
 					</ee:transform>
 					<choice doc:name="Choice" doc:id="c7990b53-c233-4d02-b831-28799a36382d">
-						<when expression='#[(not payload..httpRequestConfigRef[0] == null) and (not vars.globalConfigs..httpRequestConfigName[0] == payload..httpRequestConfigRef[0])]'>
+						<when expression='#[(not payload..httpRequestConfigRef[0] == null) and (not (vars.globalConfigs..httpRequestConfigName contains payload..httpRequestConfigRef[0]))]'>
 							<flow-ref doc:name="getConfigurationSubFlow" doc:id="ba655a4b-3197-43e2-be78-a87bd5f9f0d0" name="getConfigurationSubFlow" />
 							<ee:transform doc:name="Put globalConfigs to var" doc:id="e7409a30-0d0b-4994-95b9-a90cf0849b7a">
 								<ee:message />
@@ -982,7 +989,6 @@ output application/json
 
 var apiNamesConversion = read(p('api.namesConversion'),'application/json')
 var env = vars.originalPayload.configFiles[0] replace /-.*.yaml/ with(" value")
-var requestPath = (substringBefore(payload..httpRequestPath[0],"/") replace /(^\$\{)/ with("")) replace /\}/ with("")
 ---
 vars.properties filter((obj) -> obj."api name"== vars.apiName and obj."property full path" == substringAfter(substringBefore(payload..httpRequestPath[0],"}/"),"{")) map {
 	currentApiName: $."api name",

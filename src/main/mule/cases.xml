@@ -1167,16 +1167,30 @@ var arr = [
         }
       },
       {
-        		"componentAttributes": {
-          		"httpRequestPath": "#[vars.path.url]",
-          		"httpRequestConfigRef": "SupplierProcessAPI_HTTP_Request_configuration",
-          		"httpRequestMethod": "GET"
-        	}
-      	},
+        "componentAttributes": {
+         "httpRequestPath": "#[vars.path.url]",
+         "httpRequestConfigRef": "SupplierProcessAPI_HTTP_Request_configuration",
+         "httpRequestMethod": "GET"
+        }
+      },
       {
         "componentAttributes": {
           "httpRequestPath": "products/{productCode}",
           "httpRequestConfigRef": "IngresAPI_HTTP_Request",
+          "httpRequestMethod": "GET"
+        }
+      },
+      {
+        "componentAttributes": {
+          "httpRequestPath": "{http.sap-api.basePath.invoice-cred-deb}invoiceHeaders",
+          "httpRequestConfigRef": "SAP_ERP_HTTP_Request",
+          "httpRequestMethod": "GET"
+        }
+      },
+      {
+        "componentAttributes": {
+          "httpRequestPath": "{http.sap-api.basePath.credit-balance}/creditInfo",
+          "httpRequestConfigRef": "SAP_ERP_HTTP_Request",
           "httpRequestMethod": "GET"
         }
       }
@@ -1185,15 +1199,50 @@ var replacement = arr..httpRequestPath[0]
 //arr update ["componentAttributes", field("httpRequestPath")]  with substringAfter(replacement,"/")
 //v update "httpRequestPath"  with appendIfMissing('$(lower(v..httpRequestMethod[0])):/',substringAfter(v..httpRequestPath[0],"/")))
 //v update "httpRequestPath" with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', v..httpRequestPath[0])
-fun trimSlash(s: String) = if (s startsWith("/")) substringAfter(s,"/") else s
+fun trimSlash(s: String) = 
+	if (s startsWith("//")) 
+		substring(s,2,sizeOf(s))
+	else if (s startsWith("/"))
+		substringAfter(s,"/")
+	else s
 ---
 arr map {
 	c: $ mapObject(v,k) -> 
 	if (k ~= "componentAttributes") 
     {(k): 
-    	if (contains(v..httpRequestPath[0],/\{/)) 
-    		v update "httpRequestPath"  with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', trimSlash((substringAfter(v..httpRequestPath[0],"/"))))
-    		
+    	if (matches(v..httpRequestPath[0],/%dw 2.0
+import * from dw::util::Values
+import * from dw::core::Strings
+
+output application/json
+
+fun trimSlash(s: String) = 
+	if (s startsWith("//")) 
+		substring(s,2,sizeOf(s))
+	else if (s startsWith("/"))
+		substringAfter(s,"/")
+	else s
+---
+vars.implFlows ++ (payload map {
+	f: $ mapObject(value,key) -> 
+	if (key ~= "flowComponents") 
+    {(key): value map {
+    		c: $ mapObject(v,k) -> 
+    			if (k ~= "componentAttributes") 
+    			{(k): 
+    				if (matches(v..httpRequestPath[0],/(?<=^\$)(\{\w*.*\})(\/{0,2}\w+)*(\w*(\-\w*)*(\/)*)*/)) 
+    					v update "httpRequestPath"  with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', trimSlash(substringAfter(v..httpRequestPath[0],"}") default ""))
+    				else 
+    					v update "httpRequestPath" with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', trimSlash(v..httpRequestPath[0] default ""))
+    				} 
+  				else 
+    				{(k): v}				
+    			}.c	
+    }
+  else 
+    {(key): value}
+}.f)/)) 
+    		v update "httpRequestPath"  with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', trimSlash((substringAfter(v..httpRequestPath[0],"}"))))
     	else 
     		v update "httpRequestPath" with appendIfMissing('$(lower(v..httpRequestMethod[0])):/', trimSlash(v..httpRequestPath[0]))
     	} 
@@ -1377,6 +1426,30 @@ arr map {
 				v default "null"
 		}
 }.names partition (item) -> not contains(item.name,/\#/)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="startsWith() and matches()" doc:id="3dcd25af-fce7-4869-a8d7-a50dce9c2075" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+var s = "products/{productCode}"
+var s2 = "{http.requester.profile-process-api.basePath}//profiles/customers"
+var s3 = "{http.sap-api.basePath.invoice-cred-deb}invoiceHeaders"
+var s4 = "//profiles/customers"
+var s5="{http.requester.profile-process-api.basePath}/d"
+var s6 = "{http.requester.supplier-process-api.basePath}/data-report"
+---
+{
+	s:s startsWith("/"),
+	c:contains(s,/\{/),
+	s2:  (s2 startsWith("{")) and contains(s2,/\//),
+	s3: (s3 startsWith("{")) and contains(s3,/\//),
+	s4: substring(s4,2,sizeOf(s4)),
+	s5: matches(s5,/(^\{\w*.*\})(\/{0,2}\w+)*(\w*(\-\w*)*(\/)*)*/),
+	s6: matches(s6,/(^\{\w*.*\})(\/{0,2}\w+)*(\w*(\-\w*)*(\/)*)*/)
+	
+}]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 	</flow>
