@@ -16,7 +16,7 @@ projects:
   
 property:
   fileList: ["local-properties.yaml","dev-properties.yaml","qa-properties.yaml","uat-properties.yaml","prod-properties.yaml"]
-  #fileList: ["local-properties.yaml","dev-properties.yaml"]
+  exclusions: ["b2b-hub-bi-reports-process-api_uat-properties.yaml","b2b-hub-bi-reports-system-api_uat-properties.yaml"]
   
 descriptions: [
   "api.version - version of created API",

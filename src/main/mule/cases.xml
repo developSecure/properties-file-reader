@@ -1439,6 +1439,7 @@ var s3 = "{http.sap-api.basePath.invoice-cred-deb}invoiceHeaders"
 var s4 = "//profiles/customers"
 var s5="{http.requester.profile-process-api.basePath}/d"
 var s6 = "{http.requester.supplier-process-api.basePath}/data-report"
+var s7 = "{http.requester.supplier-process-api.basePath}/back-order-cancellation"
 ---
 {
 	s:s startsWith("/"),
@@ -1447,7 +1448,8 @@ var s6 = "{http.requester.supplier-process-api.basePath}/data-report"
 	s3: (s3 startsWith("{")) and contains(s3,/\//),
 	s4: substring(s4,2,sizeOf(s4)),
 	s5: matches(s5,/(^\{\w*.*\})(\/{0,2}\w+)*(\w*(\-\w*)*(\/)*)*/),
-	s6: matches(s6,/(^\{\w*.*\})(\/{0,2}\w+)*(\w*(\-\w*)*(\/)*)*/)
+	s6: matches(s6,/(^\{\w*.*\})(\/{0,2}\w+)*(\w*(\-\w*)*(\/)*)*/),
+	s7: matches(s7,/(^\{\w*.*\})(\/{0,2}\w+)*(\w*(\-\w*)*(\/)*)*/)
 	
 }]]></ee:set-payload>
 			</ee:message>
@@ -1557,12 +1559,24 @@ import * from dw::core::Strings
 import * from dw::core::Arrays
 output application/json
 
-var size = sizeOf(vars.globalConfigs)
-var currentapi = "b2b-hub-sfdc-experience-api"
-var key = "OrderProcessAPI_HTTP_Request_configuration_order-pa"
-//vars.globalConfigs filter $..httpRequestConfigName[0] == ea..httpRequestConfigRef[0]
+var globalConfigs = [{
+    "currentApiName": "b2b-sap-order-process-api",
+    "propertyFullPath": "http.order-process-api.basePath",
+    "httpRequestConfigName": "OrderProcessAPI_HTTP_Request_configuration",
+    "requestApiShortName": "sap-order-pa",
+    "requestApiFullName": "b2b-sap-order-process-api"
+  },
+  {
+    "currentApiName": "b2b-sap-order-process-api",
+    "propertyFullPath": "http.sap-api.basePathShort",
+    "httpRequestConfigName": "SAP_API_HTTP_Request_configuration",
+    "requestApiShortName": "s4-eu-salesorder-sa",
+    "requestApiFullName": "sap-api"
+  }]
+  var apiName = "b2b-sap-sfdc-experience-api"
+  
 ---
-vars.globalConfigs filter ($.currentApiName == "b2b-hub-sfdc-experience-api" and $..httpRequestConfigName[0] == "OrderProcessAPI_HTTP_Request_configuration")]]></ee:set-payload>
+(not payload..httpRequestConfigRef[0] == null) and (not (vars.globalConfigs..httpRequestConfigName contains payload..httpRequestConfigRef[0]))]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<ee:transform doc:name="processing excludedImpl" doc:id="bc374501-798d-491a-b40a-20ace93c8b72" >
