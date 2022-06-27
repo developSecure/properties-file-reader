@@ -202,7 +202,7 @@ output application/json
 output application/json
 ---
 vars.totalApiFlows ++ (
-	Process_Details: vars.pa_sa_added_array map {
+	Process_Details: vars.pa_sa_added_array default [] map {
 	'#': $$ + 1,
 	Process_API_endpoint: $.pa_path,
 	Process_API_name: $.pa_name,
@@ -382,8 +382,29 @@ output application/json
 vars.apiFile.flows filter $..flowRefName[0] == payload.key]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-			<foreach doc:name="For Each" doc:id="70f885e0-0701-418b-8412-8a78f2a0500f" >
-				<ee:transform doc:name="Replace httpRequestPath with valid value" doc:id="d7b7731b-911e-4895-ac13-45c546c878c0">
+			<choice doc:name="Choice" doc:id="49ca03df-d366-44da-92a8-54f92bd38e86" >
+				<when expression="#[not isEmpty(payload)]">
+					<foreach doc:name="For Each" doc:id="70f885e0-0701-418b-8412-8a78f2a0500f">
+				<ee:transform doc:name="prepare requestPath" doc:id="2d350a3b-0d74-469b-9870-79b43e140409" >
+							<ee:message >
+							</ee:message>
+							<ee:variables >
+								<ee:set-variable variableName="requestPath" ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+import * from modules::globalFun
+output application/json
+
+var path = trimString(payload..flowName[0])
+var id = appendIfMissing('$(vars.apiName)_',path)
+var exclusion = (p('api.subflow.exclusions') splitBy (",")) filter ($ contains id)
+---
+if(not isEmpty(exclusion))
+	(path: substringAfterLast(exclusion[0],"_")).path
+else
+	path]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+						<ee:transform doc:name="Replace httpRequestPath with valid value" doc:id="d7b7731b-911e-4895-ac13-45c546c878c0">
 				<ee:message>
 					<ee:set-payload><![CDATA[%dw 2.0
 import * from dw::util::Values
@@ -397,7 +418,7 @@ vars.corruptedFlow mapObject(value,key) ->
 			c: $ mapObject(v,k) ->
 				if (k ~= "componentAttributes")
 					{(k): 
-						v update "httpRequestPath"  with trimString(payload..flowName[0]) 	
+						v update "httpRequestPath"  with vars.requestPath 	
 					}
 				else
 					{(k): v}
@@ -407,18 +428,28 @@ vars.corruptedFlow mapObject(value,key) ->
     {(key): value}]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
-				<ee:transform doc:name="Put replaced obj to implFlows" doc:id="41a860ad-d6e9-4d4c-8a70-df3d7092400d" >
-					<ee:message >
+				<ee:transform doc:name="Put replaced obj to implFlows" doc:id="41a860ad-d6e9-4d4c-8a70-df3d7092400d">
+					<ee:message>
 					</ee:message>
-					<ee:variables >
-						<ee:set-variable variableName="implFlows" ><![CDATA[%dw 2.0
+					<ee:variables>
+						<ee:set-variable variableName="implFlows"><![CDATA[%dw 2.0
 output application/json
 ---
 vars.implFlows << payload]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
 			</foreach>
-			<ee:transform doc:name="Remove corrupted flow from excludedImplFlows" doc:id="f7903a87-d3d9-4c81-9d7f-335fb71c3743">
+					<ee:transform doc:name="save generatedApiFile" doc:id="9c3fbd8d-e558-425e-832f-af5a140f28ca">
+						<ee:message>
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="generatedApiFile" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<ee:transform doc:name="Remove corrupted flow from excludedImplFlows" doc:id="f7903a87-d3d9-4c81-9d7f-335fb71c3743">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
@@ -428,6 +459,11 @@ output application/json
 vars.excludedImplFlows - vars.corruptedFlow]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+				</when>
+				<otherwise >
+					<logger level="INFO" doc:name="Logger" doc:id="89ebb4d8-4f38-4d1d-9586-66a2854a75ea" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	message: "The apiFile does not contain the specified flow",&#10;	apiName: vars.apiName,&#10;	fileName: vars.corruptedFlow.fileName,&#10;	subFlow: vars.corruptedFlow.key&#10;}]'/>
+				</otherwise>
+			</choice>
 		</foreach>
 		<remove-variable doc:name="corruptedFlow" doc:id="173197f1-5c2b-40e1-b9fd-aa9f55249c58" variableName="corruptedFlow" />
 	</sub-flow>
@@ -513,12 +549,11 @@ vars.schedulers ++ vars.totalFlows]]></ee:set-variable>
 		<remove-variable doc:name="cronTime" doc:id="aced8e3c-c8e1-4535-8ed3-c45e76567f80" variableName="cronTime"/>
 		<remove-variable doc:name="httpListenerPath" doc:id="43fb0e71-5378-43d1-888d-3f65ecd63745" variableName="httpListenerPath"/>
 	</sub-flow>
-	<sub-flow name="readImplFileSubFlow" doc:id="a3bbe2aa-d25f-4623-9fb9-a8f4128e7683" >
-		<set-variable value="#[[] as Array]" doc:name="totalFlows" doc:id="0007657d-1dea-455a-b133-d564328e3627" variableName="totalFlows" />
-		<set-variable value="#[0 as Number]" doc:name="index" doc:id="60c9e137-d348-4527-bfcd-5136e114c5ee" variableName="index"/>
-		<foreach doc:name="Traversing all apiFlows" doc:id="238eb662-f50f-4685-aec3-7168fe43ffdb" collection="#[vars.apiFile.flows default []]">
+	<sub-flow name="traversingAllApiFlowsSubFlow" doc:id="fca8dbb2-91a7-459a-85a9-8543ba590a9c" >
+		<foreach doc:name="Traversing all apiFlows" doc:id="238eb662-f50f-4685-aec3-7168fe43ffdb" collection="#[payload]">
 			<set-variable value="#[[] as Array]" doc:name="requestComponents" doc:id="ca58d5cd-3b81-4c9e-ba28-e1b862297038" variableName="requestComponents" />
 			<set-variable value='#[payload.flowComponents.componentName[0] default "Unknown"]' doc:name="apiFlowName" doc:id="c2489304-b099-4174-b087-beaf4e988efc" variableName="apiFlowName" />
+			<set-variable value="#[[] as Array]" doc:name="generatedApiFile" doc:id="532b877f-184c-46fe-bf68-db609f703d5f" variableName="generatedApiFile"/>
 			<ee:transform doc:name="Set httpListenerPath" doc:id="a71581b8-78aa-4c94-a768-612b5ad5f09b">
 				<ee:message>
 				</ee:message>
@@ -541,7 +576,7 @@ output application/json
 				<ee:variables>
 				</ee:variables>
 			</ee:transform>
-			<choice doc:name="Choice" doc:id="ae316376-9171-47cf-bad7-e5d1bc09dc29" >
+			<choice doc:name="Choice" doc:id="ae316376-9171-47cf-bad7-e5d1bc09dc29">
 				<when expression="#[(not payload == null) and sizeOf(payload) &gt; 1]">
 					<ee:transform doc:name="save current payload" doc:id="b479fb6c-ab46-4f77-93fc-8f48ad0fb353">
 						<ee:message>
@@ -571,8 +606,8 @@ vars.index match {
 					<ee:transform doc:name="change index" doc:id="58b358d4-06e9-4fc3-8fe0-5502fa2f01a3">
 						<ee:message>
 						</ee:message>
-						<ee:variables >
-							<ee:set-variable variableName="index" ><![CDATA[%dw 2.0
+						<ee:variables>
+							<ee:set-variable variableName="index"><![CDATA[%dw 2.0
 output application/json
 ---
 if (sizeOf(vars.currentPayload) - 1 == vars.index) {
@@ -584,7 +619,7 @@ if (sizeOf(vars.currentPayload) - 1 == vars.index) {
 					</ee:transform>
 					<flow-ref doc:name="while-loopSubFlow" doc:id="ad95c74b-3c5c-42f1-ac3a-1aa797e1c77f" name="while-loopSubFlow" />
 				</when>
-				<otherwise >
+				<otherwise>
 					<ee:transform doc:name="get subFlow from array" doc:id="feeb3cbc-6039-4b66-b7c8-4a1085151759">
 						<ee:message>
 							<ee:set-payload><![CDATA[%dw 2.0
@@ -609,12 +644,31 @@ var flow = {
 		components: vars.requestComponents
 	}
 }
+var flowKey = '$(keysOf(flow)[0])_$(flow..apiName[0])_$(flow..httpListenerPath[0])'
 ---
-vars.totalFlows << flow]]></ee:set-variable>
+if(not ((vars.totalFlows map(key) -> {
+	ids: '$(keysOf(key)[0])_$(key..apiName[0])_$(key..httpListenerPath[0])'
+}.ids) contains flowKey))
+	vars.totalFlows << flow
+else
+	vars.totalFlows]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</foreach>
-		<ee:transform doc:name="Transform Message" doc:id="8ed5222f-8052-446f-9e9b-91a6da34662f" >
+	</sub-flow>
+	<sub-flow name="readImplFileSubFlow" doc:id="a3bbe2aa-d25f-4623-9fb9-a8f4128e7683" >
+		<set-variable value="#[[] as Array]" doc:name="totalFlows" doc:id="0007657d-1dea-455a-b133-d564328e3627" variableName="totalFlows" />
+		<set-variable value="#[0 as Number]" doc:name="index" doc:id="60c9e137-d348-4527-bfcd-5136e114c5ee" variableName="index"/>
+		<ee:transform doc:name="set apiFlows to payload" doc:id="0d8a2543-048b-4fe8-abaa-f795fd674f1b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.apiFile.flows default []]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="traversingAllApiFlowsSubFlow" doc:id="544fd238-7ae8-4c34-9dd3-6d1bba071ade" name="traversingAllApiFlowsSubFlow"/>
+		<ee:transform doc:name="set totalFlows to payload" doc:id="8ed5222f-8052-446f-9e9b-91a6da34662f" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -626,6 +680,7 @@ vars.totalFlows]]></ee:set-payload>
 		<remove-variable doc:name="requestComponents" doc:id="43902775-5900-4f9d-9ef4-9ffbdd986146" variableName="requestComponents"/>
 		<remove-variable doc:name="httpListenerPath" doc:id="529417b0-804d-484d-9e62-ada210623ce5" variableName="httpListenerPath"/>
 		<remove-variable doc:name="apiFlowName" doc:id="6f3cad26-7b22-43cc-afbe-9f6aef69250f" variableName="apiFlowName"/>
+		<remove-variable doc:name="generatedApiFile" doc:id="3db17c3d-8732-407f-99ad-4623bb7606ac" variableName="generatedApiFile"/>
 		<choice doc:name="Choice" doc:id="43f9ee98-0786-4094-93dd-feebbd0acd5b">
 				<when expression="#[matches(vars.apiName, /^.*experience-api/)]">
 					<ee:transform doc:name="Save experience api flows" doc:id="5d7587fb-73cd-446c-a0dd-9f82d2a494d2">
@@ -663,7 +718,8 @@ vars.systemApis ++ payload]]></ee:set-variable>
 			</choice>
 	</sub-flow>
 	<sub-flow name="while-loopSubFlow" doc:id="0b9817e0-901a-4b83-a3b0-43ccc3ac5820" >
-		<set-variable value='#[""]' doc:name="flowRefName" doc:id="3d6f564c-7fee-4a6f-8b0d-95f86d5f2ab5" variableName="flowRefName"/>
+		<set-variable value='#[payload]' doc:name="currentImplFlow" doc:id="4bbcfe73-ab7e-4294-96b8-59520fb6c5e5" variableName="currentImplFlow"/>
+		<set-variable value='#[payload]' doc:name="flowRefName" doc:id="3d6f564c-7fee-4a6f-8b0d-95f86d5f2ab5" variableName="flowRefName"/>
 		<foreach doc:name="For Each" doc:id="25e5586d-8bff-472b-be79-b8d893216eb5" collection="#[payload.flowComponents default []]">
 			<ee:transform doc:name="Transform Message" doc:id="9e5731a9-476c-4b64-bf20-5b1d67a9bd5c">
 			<ee:message>
@@ -704,7 +760,7 @@ vars.requestComponents << payload]]></ee:set-variable>
 					</ee:transform>
 				</when>
 				<when expression="#[not isEmpty(vars.flowRefName)]">
-					<ee:transform doc:name="Transform Message" doc:id="d396741e-e980-45c8-815c-3f69942aa06e">
+					<ee:transform doc:name="Find subFlow in implFlows" doc:id="d396741e-e980-45c8-815c-3f69942aa06e">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -712,10 +768,54 @@ output application/json
 (vars.implFlows filter((value) -> value.key == vars.flowRefName))[0]]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
-					<flow-ref doc:name="while-loopSubFlow" doc:id="3c7cbfc5-5ecc-4f89-9b7b-3dfbd19b3177" name="while-loopSubFlow" />
+					<choice doc:name="Choice" doc:id="d2aa78f1-a00e-4d17-8208-f81331a0e5b2">
+						<when expression="#[payload == null and not isEmpty(vars.excludedImplFlows)]">
+							<ee:transform doc:name="Find subFlow in excludedImplFlows" doc:id="07ea5aab-3ed2-4c61-b51b-dfdaba6a702b">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="excludedImplFlows"><![CDATA[%dw 2.0
+import * from dw::util::Values
+output application/json
+
+var subFlow = (vars.excludedImplFlows filter((value) -> value.key == vars.flowRefName))[0]
+---
+if (not subFlow == null)
+	[] << (subFlow update "key" with vars.apiFlowName)
+else
+	subFlow]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+							<ee:transform doc:name="Remove unneсessary subFlow from implFlows" doc:id="950b4a18-a513-4f5d-89a7-955150b5c2cc">
+								<ee:message>
+								</ee:message>
+								<ee:variables >
+									<ee:set-variable variableName="implFlows" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.implFlows - vars.currentImplFlow]]></ee:set-variable>
+								</ee:variables>
+							</ee:transform>
+							<flow-ref doc:name="readExcludedFlowsSubFlow" doc:id="b07abb40-9de4-4564-ae26-a5e80a6c1bbc" name="readExcludedFlowsSubFlow" />
+							<ee:transform doc:name="set generatedApiFile to payload" doc:id="ddf3d283-f965-46da-b5aa-f108e2ed484a">
+								<ee:message>
+									<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.generatedApiFile]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+							<flow-ref doc:name="traversingAllApiFlowsSubFlow" doc:id="2839652b-1026-4cdc-b29e-06a622705bcf" name="traversingAllApiFlowsSubFlow"/>
+						</when>
+						<otherwise>
+							<flow-ref doc:name="while-loopSubFlow" doc:id="3c7cbfc5-5ecc-4f89-9b7b-3dfbd19b3177" name="while-loopSubFlow" />
+						</otherwise>
+					</choice>
 				</when>
 			</choice>
 		</foreach>
+		<remove-variable doc:name="currentImplFlow" doc:id="b1f61e6b-a308-4257-bba6-0b91c5613e48" variableName="currentImplFlow"/>
+		<remove-variable doc:name="flowRefName" doc:id="0eba9709-da05-4363-8dcc-167984872a05" variableName="flowRefName" />
 	</sub-flow>
 	<sub-flow name="readApiFlowsMainSubFlow" doc:id="1b639521-c277-4557-b93d-00baf734dc0d" >
 		<set-variable value="#[[] as Array]" doc:name="Set globalConfigs" doc:id="bf8d9b1f-b242-4c18-bb10-333158848a6e" variableName="globalConfigs" />
@@ -965,6 +1065,7 @@ vars.globalConfigs ++ payload]]></ee:set-variable>
 				</otherwise>
 		</choice>
 		</foreach>
+		<remove-variable doc:name="httpConfigName" doc:id="7306e2a3-05b0-430c-8ff9-5cebdf586e7f" variableName="httpConfigName"/>
 		<ee:transform doc:name="Find corrupted flows" doc:id="f6a22274-94eb-42d5-b6be-5d4a9a55b5b6" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0

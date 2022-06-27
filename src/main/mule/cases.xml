@@ -1312,6 +1312,31 @@ arr map {
 }.f]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<ee:transform doc:name="update key field in complicated object structure" doc:id="a3513a4f-d1b1-411c-9474-fa2b20933943" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::util::Values
+import * from dw::core::Strings
+output application/json
+var obj = {
+    "key": "sapContractSettlementDocumentsRequestSubFlow",
+    "fileName": "b2b-sap-supplier-contract-settlement-documents-impl.xml",
+    "flowComponents": [
+      {
+        "componentAttributes": {
+          "httpRequestPath": "get:/#['{http.sap-api.basePath.settlement-docs}' ++ vars.path.url]",
+          "httpRequestConfigRef": "SAP_API_HTTP_Request_configuration",
+          "httpRequestMethod": "GET"
+        },
+        "componentName": "request"
+      }
+    ]
+  }
+var apiFlowName = "getSapContractSettlementDocumentsSubFlow"
+---
+obj update "key" with apiFlowName]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 		<ee:transform doc:name="traversing array" doc:id="e236ab0b-90de-49ac-aea2-10b1dd860cb4" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
